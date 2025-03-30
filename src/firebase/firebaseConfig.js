@@ -3,15 +3,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
-// TODO: Replace with your actual Firebase config object
+// Firebase config is loaded from environment variables
 const firebaseConfig = {
-    apiKey: "AIzaSyAQOogYuOAKJt4irq17qvuOadGTA5dr08o",
-    authDomain: "rfid-com-esp32.firebaseapp.com",
-    databaseURL: "https://rfid-com-esp32-default-rtdb.firebaseio.com",
-    projectId: "rfid-com-esp32",
-    storageBucket: "rfid-com-esp32.firebasestorage.app",
-    messagingSenderId: "727661669807",
-    appId: "1:727661669807:web:daeb96fcd2799e75fe935a"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
