@@ -8,7 +8,7 @@ const GEMINI_CONFIG = {
     // Chave API e Endpoint
     // !! IMPORTANTE: Mova a chave API para variáveis de ambiente em produção !!
     // Ex: apiKey: import.meta.env.VITE_GEMINI_API_KEY || "SUA_CHAVE_AQUI_PARA_DEV",
-    apiKey: "AIzaSyB_zYq8J9iAGLjqjLvHa5JaR6MvdLvPp4k", // Sua chave API (Substitua ou use env var)
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY, // Sua chave API (Substitua ou use env var)
     apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest/:generateContent", // Modelo Flash ou Pro (Verifique o endpoint mais recente)
 
     // Configurações de Geração
@@ -54,5 +54,5 @@ const GEMINI_CONFIG = {
 
 export default GEMINI_CONFIG;
 
-console.log("GEMINI_CONFIG loaded:", GEMINI_CONFIG);
+console.log("GEMINI_CONFIG loaded:");
 // --- END OF FILE src/config/geminiConfig.js ---
