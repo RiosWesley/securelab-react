@@ -5,7 +5,7 @@
     background-color: #f8f9fa;
     border-radius: 8px;
   }
-  
+
   .benchmark-title {
     font-size: 1rem;
     font-weight: 600;
@@ -13,18 +13,18 @@
     margin-bottom: 15px;
     text-align: center;
   }
-  
+
   .benchmark-metrics {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .benchmark-item {
     display: flex;
     align-items: center;
   }
-  
+
   .benchmark-label {
     width: 100px;
     display: flex;
@@ -33,12 +33,12 @@
     font-weight: 500;
     color: var(--dark-color);
   }
-  
+
   .benchmark-label i {
     width: 16px;
     color: var(--primary-color);
   }
-  
+
   .benchmark-bar-container {
     flex: 1;
     height: 12px;
@@ -47,30 +47,30 @@
     overflow: hidden;
     position: relative;
   }
-  
+
   .benchmark-bar {
     height: 100%;
     border-radius: 6px;
     transition: width 0.5s ease;
   }
-  
+
   /* Cores diferentes para cada métrica */
   #cpu-usage-bar {
     background-color: #4a6cf7; /* Azul */
   }
-  
+
   #ram-usage-bar {
     background-color: #2ecc71; /* Verde */
   }
-  
+
   #temp-value-bar {
     background-color: #e74c3c; /* Vermelho */
   }
-  
+
   #latency-value-bar {
     background-color: #f39c12; /* Laranja */
   }
-  
+
   .benchmark-value {
     position: absolute;
     right: 8px;
@@ -79,7 +79,7 @@
     font-weight: 600;
     color: var(--dark-color);
   }
-  
+
   /* Dispositivo mais sobrecarregado */
   .hotspot-device {
     margin-top: 20px;
@@ -90,25 +90,25 @@
     flex-direction: column;
     align-items: center;
   }
-  
+
   .hotspot-title {
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--dark-color);
     margin-bottom: 5px;
   }
-  
+
   .hotspot-info {
     display: flex;
     justify-content: space-between;
     width: 100%;
   }
-  
+
   #hotspot-device-name {
     font-weight: 600;
     color: var(--primary-color);
   }
-  
+
   #hotspot-device-load {
     padding: 2px 8px;
     background-color: rgba(231, 76, 60, 0.2);
@@ -117,45 +117,45 @@
     font-weight: 600;
     color: #e74c3c;
   }
-  
+
   /* Responsividade */
   @media (max-width: 768px) {
     .benchmark-label {
       width: 80px;
       font-size: 0.85rem;
     }
-    
+
     .benchmark-value {
       font-size: 0.75rem;
     }
   }
-  
+
   /* Tema escuro */
   html[data-theme="dark"] .benchmark-container {
     background-color: var(--dark-card-bg);
   }
-  
+
   html[data-theme="dark"] .benchmark-title,
   html[data-theme="dark"] .benchmark-label {
     color: var(--dark-text-primary);
   }
-  
+
   html[data-theme="dark"] .benchmark-bar-container {
     background-color: var(--dark-input-bg);
   }
-  
+
   html[data-theme="dark"] .benchmark-value {
     color: var(--dark-text-primary);
   }
-  
+
   html[data-theme="dark"] .hotspot-device {
     background-color: rgba(231, 76, 60, 0.15);
   }
-  
+
   html[data-theme="dark"] .hotspot-title {
     color: var(--dark-text-primary);
   }
-  
+
   html[data-theme="dark"] #hotspot-device-load {
     background-color: rgba(231, 76, 60, 0.25);
   }
@@ -164,27 +164,286 @@
 .benchmark-bar.normal {
     opacity: 0.9;
   }
-  
+
   .benchmark-bar.warning {
     opacity: 1;
-    background-image: linear-gradient(45deg, 
-      rgba(0, 0, 0, 0.15) 25%, 
-      transparent 25%, 
-      transparent 50%, 
-      rgba(0, 0, 0, 0.15) 50%, 
-      rgba(0, 0, 0, 0.15) 75%, 
-      transparent 75%, 
+    background-image: linear-gradient(45deg,
+      rgba(0, 0, 0, 0.15) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.15) 50%,
+      rgba(0, 0, 0, 0.15) 75%,
+      transparent 75%,
       transparent);
     background-size: 10px 10px;
   }
-  
+
   .benchmark-bar.critical {
     opacity: 1;
     animation: pulse-critical 1.5s infinite;
   }
-  
+
   @keyframes pulse-critical {
     0% { opacity: 0.7; }
     50% { opacity: 1; }
     100% { opacity: 0.7; }
   }
+
+/* --- Activity Chart Styles --- */
+.chart-container {
+    margin-top: 25px;
+    padding: 20px;
+    /* Inherits card styles from components.css or styles.css */
+}
+
+.chart-title {
+    font-size: 1.1rem; /* Slightly larger title */
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    text-align: left; /* Align title left */
+}
+
+.chart-filters {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px; /* Space between filter groups */
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column; /* Stack labels and inputs/options vertically */
+    gap: 8px;
+}
+
+.filter-group label:first-child { /* Style the main label for the group */
+    font-weight: 500;
+    color: var(--dark-color);
+    margin-bottom: 4px; /* Small space below main label */
+}
+
+.date-range-filter {
+    display: flex;
+    flex-direction: row; /* Keep date inputs side-by-side */
+    align-items: center;
+    gap: 10px;
+}
+
+.date-range-filter label {
+    margin-bottom: 0; /* Remove bottom margin for inline labels */
+    font-weight: normal; /* Normal weight for 'De:' and 'Até:' */
+}
+
+.date-range-filter input[type="date"] {
+    padding: 6px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--light-bg);
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+
+.door-filter .door-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 15px; /* Row and column gap */
+    max-height: 100px; /* Limit height and allow scrolling if needed */
+    overflow-y: auto; /* Add scroll for many doors */
+    padding: 10px; /* Padding inside the scroll area */
+    border: 1px solid var(--border-color); /* Optional border */
+    border-radius: 4px;
+}
+
+.door-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Slightly more gap */
+}
+
+.door-checkbox input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--primary-color); /* Modern way to color checkboxes */
+    width: 15px; /* Explicit size */
+    height: 15px;
+    vertical-align: middle; /* Align with label text */
+    appearance: none; /* Remove default appearance */
+    background-color: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    position: relative;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.door-checkbox input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Custom checkmark */
+.door-checkbox input[type="checkbox"]:checked::before {
+    content: '✔';
+    position: absolute;
+    top: -2px; /* Adjust position */
+    left: 1px;  /* Adjust position */
+    font-size: 12px;
+    color: #fff; /* White checkmark */
+}
+
+.door-checkbox input[type="checkbox"]:hover {
+    border-color: var(--primary-color);
+}
+
+
+.door-checkbox label {
+    font-weight: normal;
+    color: var(--dark-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    user-select: none; /* Prevent text selection on label click */
+}
+
+.door-select-all {
+    display: flex;
+    gap: 10px;
+    width: 100%; /* Make buttons take full width */
+    margin-bottom: 10px; /* Space below buttons */
+    padding-bottom: 10px; /* Space before checkboxes */
+    border-bottom: 1px dashed var(--border-color); /* Separator */
+}
+
+.door-select-all .btn-sm {
+    /* Inherit base button styles if available, or define here */
+    padding: 5px 10px; /* Slightly more padding */
+    font-size: 0.8rem;
+    border: 1px solid var(--primary-color);
+    background-color: transparent;
+    color: var(--primary-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.door-select-all .btn-sm:hover {
+    background-color: var(--primary-color-light); /* Use a lighter shade for hover */
+    color: #fff; /* White text on hover */
+    border-color: var(--primary-color-light); /* Match border */
+}
+
+
+.chart-placeholder {
+    /* Styles are applied inline for height/width */
+    position: relative; /* Needed for loading/error overlays if added */
+}
+
+.loading-chart,
+.chart-error,
+.chart-no-data {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* Ensure some height */
+    padding: 20px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.loading-chart {
+    color: var(--secondary-color);
+}
+
+.chart-error {
+    background-color: rgba(231, 76, 60, 0.1); /* Light red background */
+    color: #e74c3c; /* Red text */
+    border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.chart-no-data {
+    color: var(--secondary-color);
+    background-color: var(--light-bg);
+    border: 1px dashed var(--border-color);
+}
+
+/* --- Dark Mode Chart Styles --- */
+html[data-theme="dark"] .chart-title,
+html[data-theme="dark"] .filter-group label:first-child,
+html[data-theme="dark"] .date-range-filter label,
+html[data-theme="dark"] .door-checkbox label {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .chart-filters {
+    border-bottom-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .date-range-filter input[type="date"] {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .door-filter .door-options {
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .door-select-all {
+    border-bottom-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .door-select-all .btn-sm {
+    border-color: var(--dark-primary-color); /* Use dark theme primary color */
+    color: var(--dark-primary-color);
+}
+
+html[data-theme="dark"] .door-select-all .btn-sm:hover {
+    background-color: var(--dark-primary-color-light); /* Use dark theme lighter shade */
+    color: var(--dark-card-bg); /* Adjust text color for contrast */
+    border-color: var(--dark-primary-color-light);
+}
+
+html[data-theme="dark"] .door-checkbox input[type="checkbox"] {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border-color);
+    accent-color: var(--dark-primary-color); /* Checkbox color in dark mode */
+}
+
+html[data-theme="dark"] .door-checkbox input[type="checkbox"]:checked {
+    background-color: var(--dark-primary-color);
+    border-color: var(--dark-primary-color);
+}
+
+/* Custom checkmark dark mode */
+html[data-theme="dark"] .door-checkbox input[type="checkbox"]:checked::before {
+    color: var(--dark-text-primary); /* Use primary text color for checkmark for contrast */
+}
+
+html[data-theme="dark"] .door-checkbox input[type="checkbox"]:hover {
+    border-color: var(--dark-primary-color);
+}
+
+
+html[data-theme="dark"] .loading-chart,
+html[data-theme="dark"] .chart-no-data {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .chart-error {
+    background-color: rgba(231, 76, 60, 0.15);
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+html[data-theme="dark"] .chart-no-data {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+}
+
+/* Recharts specific overrides if needed */
+html[data-theme="dark"] .recharts-legend-item-text {
+    color: var(--dark-text-secondary) !important; /* Override default legend text color */
+}
+
+html[data-theme="dark"] .recharts-cartesian-axis-tick-value {
+    fill: var(--dark-text-secondary) !important; /* Override axis tick color */
+}
