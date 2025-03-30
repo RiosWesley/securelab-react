@@ -275,14 +275,15 @@ function Doors() {
                     </div>
                 </div>
                 <div className="card-body">
-                    <div className="table-responsive">
+                    {/* Desktop Table View */}
+                    <div className="table-responsive d-none d-md-block"> {/* Hide on screens smaller than md (768px) */}
                         <table className="table table-hover">
                             <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Localização</th>
+                                <th className="col-location">Localização</th>
                                 <th>Status</th>
-                                <th>Última Atividade</th>
+                                <th className="col-last-activity">Última Atividade</th>
                                 <th>Ações</th>
                             </tr>
                             </thead>
@@ -293,20 +294,20 @@ function Doors() {
                                 currentDoorsPage.map(door => (
                                     <tr key={door.id}>
                                         <td>{door.name || 'Sem nome'}</td>
-                                        <td>{door.location || '-'}</td>
+                                        <td className="col-location">{door.location || '-'}</td>
                                         <td>
                                                 <span className={`status-badge status-${door.status === 'locked' ? 'locked' : 'unlocked'}`}> {/* Use classes from components.css */}
                                                     <FontAwesomeIcon icon={door.status === 'locked' ? faLock : faLockOpen} style={{ marginRight: '5px' }} />
                                                     {formatStatus(door.status)}
                                                 </span>
                                         </td>
-                                        <td>{formatDateTime(door.last_status_change)}</td>
+                                        <td className="col-last-activity">{formatDateTime(door.last_status_change)}</td>
                                         <td>
                                             <div className="action-buttons">
                                                 <button className="action-btn action-btn-edit" onClick={() => openEditDoorModal(door)} title="Editar">
                                                     <FontAwesomeIcon icon={faEdit} />
                                                 </button>
-                                                <button className="action-btn" onClick={() => openControlModal(door)} title="Controlar">
+                                                <button className="action-btn action-btn-control" onClick={() => openControlModal(door)} title="Controlar">
                                                     <FontAwesomeIcon icon={faSlidersH} />
                                                 </button>
                                                 <button className="action-btn action-btn-delete" onClick={() => openConfirmDelete(door)} title="Excluir">
@@ -322,7 +323,48 @@ function Doors() {
                             </tbody>
                         </table>
                     </div>
-                    {/* Pagination */}
+
+                    {/* Mobile Card View */}
+                    <div className="doors-card-list d-md-none"> {/* Show only on screens smaller than md (768px) */}
+                        {loading ? (
+                            <p className="text-center">Carregando...</p>
+                        ) : currentDoorsPage.length > 0 ? (
+                            currentDoorsPage.map(door => (
+                                <div key={door.id} className="door-card card mb-3">
+                                    <div className="card-body">
+                                        <div className="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 className="card-title mb-0">{door.name || 'Sem nome'}</h5>
+                                            <span className={`status-badge status-${door.status === 'locked' ? 'locked' : 'unlocked'}`}>
+                                                <FontAwesomeIcon icon={door.status === 'locked' ? faLock : faLockOpen} style={{ marginRight: '5px' }} />
+                                                {formatStatus(door.status)}
+                                            </span>
+                                        </div>
+                                        <p className="card-text mb-1">
+                                            <strong>Localização:</strong> {door.location || '-'}
+                                        </p>
+                                        <p className="card-text mb-2">
+                                            <strong>Última Atividade:</strong> {formatDateTime(door.last_status_change)}
+                                        </p>
+                                        <div className="action-buttons">
+                                            <button className="action-btn action-btn-edit" onClick={() => openEditDoorModal(door)} title="Editar">
+                                                <FontAwesomeIcon icon={faEdit} />
+                                            </button>
+                                            <button className="action-btn action-btn-control" onClick={() => openControlModal(door)} title="Controlar">
+                                                <FontAwesomeIcon icon={faSlidersH} />
+                                            </button>
+                                            <button className="action-btn action-btn-delete" onClick={() => openConfirmDelete(door)} title="Excluir">
+                                                <FontAwesomeIcon icon={faTrashAlt} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-center">Nenhuma porta encontrada.</p>
+                        )}
+                    </div>
+
+                    {/* Pagination (Common for both views) */}
                     {!loading && filteredDoors.length > PAGE_SIZE && (
                         <Pagination
                             currentPage={currentPage}

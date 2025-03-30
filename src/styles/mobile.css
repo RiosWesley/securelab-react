@@ -36,15 +36,26 @@
   /* Ajustes globais para melhor experiência em telas pequenas */
   @media (max-width: 768px) {
     /* Melhorias gerais */
-    body {
+    body, html { /* Added html selector */
       font-size: 14px; /* Texto ligeiramente menor em dispositivos móveis */
+      margin: 0;
+      padding: 0; /* Added padding reset */
+      overflow-x: hidden; /* Prevenir rolagem horizontal */
+      display: block; /* Override global flex centering */
     }
   
-    /* Adicionar botão de menu mobile - SEMPRE VISÍVEL em mobile */
+    .app-container { /* Added app-container reset */
+      padding: 0;
+      margin: 0;
+      width: 100%;
+    }
+  
+    /* Ajustar o menu hamburguer para alinhar corretamente */
     .mobile-menu-toggle {
-      display: flex !important;
+      display: flex !important; /* Keep important if needed */
       align-items: center;
       justify-content: center;
+      padding: 10px; /* Added padding */
     }
   
     /* Ajuste da sidebar para mobile */
@@ -91,31 +102,56 @@
       display: block;
     }
   
-    /* Melhorias no header para mobile */
+    /* Ajuste do header para remover espaço extra */
     .main-header {
       padding: 0 10px;
-      height: 56px;
-      /* Ensure header content aligns correctly with mobile toggle */
-      position: relative; /* Needed if mobile toggle uses absolute */
-      display: flex; /* Ensure items align */
-      justify-content: space-between; /* Push toggle left, right content right */
+      height: 56px; /* Altura fixa para o header mobile */
+      width: 100%; /* Garantir que ocupe toda a largura */
+      left: 0; /* Alinhar completamente à esquerda */
+      display: flex;
       align-items: center;
+      justify-content: space-between;
+      /* position: relative; Removed as left: 0 is used */
     }
-    .main-header .header-right {
-      margin-left: auto; /* Push right content to the end */
+  
+    /* Remover qualquer margin ou padding que possa estar causando o espaço */
+    .main-header > * {
+      margin: 0;
+    }
+  
+    /* Garantir que o logo ou título fique centralizado */
+    .header-title { /* Added header-title rule */
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  
+    /* Ajustar os ícones da direita */
+    .header-right { /* Changed from .main-header .header-right */
+      /* margin-left: auto; Removed */
+      display: flex;
+      align-items: center;
+      gap: 10px; /* Added gap */
     }
   
     .header-search {
       display: none; /* Oculta busca em mobile para economizar espaço */
     }
   
-    /* Ajustes no conteúdo */
+    /* Redefinir comportamento da sidebar para mobile */
+    .app-container.sidebar-collapsed .main-content,
     .main-content {
-      margin-left: 0 !important; /* Força margem zero independente do estado da sidebar */
-    }
+      margin-left: 0 !important;
+    padding-left: 0 !important; /* Added */
+    width: 100% !important; /* Added */
+    /* background-color: #1a1d2a; /* Garante cor de fundo completa */ /* Removed to allow theme styles */
+    min-height: 100vh; /* Garante altura mínima */
+  }
   
+    /* Garantir que o conteúdo principal ocupe toda a largura */
     .content-wrapper {
-      padding: 15px 10px;
+      padding: 15px 15px; /* Ajustado padding horizontal */
+      width: 100%; /* Adicionado width */
     }
   
     /* Ajustes em cabeçalhos de página */
@@ -139,12 +175,19 @@
       padding: 15px;
     }
   
+    /* Ajusta os cards para ficarem bem visíveis */
+    .card {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+  
     /* Tabelas responsivas */
     /* The rule for .card-grid is already defined in styles.css @media block */
+    /* Ajusta a tabela para melhor visualização em mobile */
     .table-responsive {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      margin-bottom: 1rem;
+      margin-bottom: 0; /* Ajustado margin-bottom */
     }
   
     .table {
@@ -156,7 +199,39 @@
       padding: 10px 8px;
       white-space: nowrap;
     }
-  
+
+    /* Estilos para a visualização em card no mobile */
+    .doors-card-list .door-card {
+        border: 1px solid var(--border-color);
+        background-color: var(--card-bg);
+        box-shadow: var(--box-shadow-sm);
+    }
+
+    .doors-card-list .door-card .card-body {
+        padding: 15px; /* Ajuste o padding conforme necessário */
+    }
+
+    .doors-card-list .door-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .doors-card-list .door-card .card-text {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+    }
+    .doors-card-list .door-card .card-text strong {
+        color: var(--text-color-light); /* Ou var(--text-color) */
+    }
+
+    .doors-card-list .door-card .action-buttons {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px; /* Espaçamento entre botões */
+        justify-content: flex-end; /* Alinha botões à direita */
+    }
+
     /* Ajustes nos modais */
     .modal-dialog {
       margin: 10px;

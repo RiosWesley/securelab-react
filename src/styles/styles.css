@@ -329,7 +329,80 @@
     font-weight: 500;
     margin-right: 10px;
   }
-  
+
+  /* Icon Button (used in card headers, etc.) */
+  .icon-button {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1.1rem; /* Adjust size as needed */
+    cursor: pointer;
+    padding: 8px; /* Add padding for better click area */
+    border-radius: 50%; /* Make it circular */
+    transition: background-color 0.2s;
+    line-height: 1; /* Ensure icon is centered */
+    display: inline-flex; /* Align icon properly */
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon-button:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* Subtle hover */
+  }
+
+  /* Dropdown Menu Styles (used with icon-button for export) */
+  .dropdown {
+    position: relative;
+    display: inline-block; /* Or flex if needed */
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%; /* Position below the button */
+    right: 0; /* Align to the right */
+    background-color: white;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: var(--card-border-radius);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    z-index: 1000;
+    min-width: 160px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    display: none; /* Hidden by default */
+  }
+
+  .dropdown-menu.show {
+    display: block; /* Show when needed */
+  }
+
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 15px;
+    clear: both;
+    font-weight: 400;
+    color: var(--dark-color);
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .dropdown-item:hover,
+  .dropdown-item:focus {
+    color: var(--dark-color);
+    text-decoration: none;
+    background-color: #f8f9fa;
+  }
+
+  .dropdown-item svg { /* Style FontAwesome icons in dropdown */
+    margin-right: 8px;
+    width: 16px; /* Align icons */
+    text-align: center;
+  }
+
   /* Conteúdo Principal */
   .content-wrapper {
     padding: 20px;
@@ -416,7 +489,80 @@
   .card-body {
     padding: 20px;
   }
-  
+
+  /* Table Styles (Desktop) */
+  .table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+    border-collapse: collapse; /* Ensure borders connect nicely */
+  }
+
+  .table th,
+  .table td {
+    padding: 0.9rem 1rem; /* Increased padding */
+    vertical-align: middle; /* Align content vertically */
+    border-top: 1px solid #dee2e6; /* Add horizontal lines */
+    text-align: left; /* Default left align */
+  }
+
+  .table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6; /* Thicker border for header */
+    font-weight: 600;
+    color: var(--secondary-color);
+    background-color: #f8f9fa; /* Light background for header */
+  }
+
+  .table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03); /* Subtle hover effect */
+  }
+
+  /* Center align action buttons column */
+  .table th:last-child,
+  .table td:last-child {
+    text-align: center;
+  }
+
+  .table .action-buttons {
+    display: inline-flex; /* Use inline-flex for centering */
+    gap: 5px; /* Space between buttons */
+    justify-content: center;
+  }
+
+  .table .action-btn {
+    padding: 5px 8px; /* Slightly smaller padding for action buttons */
+    font-size: 0.9rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+
+  .table .action-btn-edit {
+    color: var(--info-color);
+    border-color: var(--info-color);
+  }
+  .table .action-btn-edit:hover {
+    background-color: rgba(23, 162, 184, 0.1);
+  }
+
+  .table .action-btn-delete {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+  }
+   .table .action-btn-delete:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+
+  /* Style for Control button */
+  .table .action-btn-control {
+      color: var(--secondary-color);
+      border-color: var(--secondary-color);
+  }
+  .table .action-btn-control:hover {
+      background-color: rgba(108, 117, 125, 0.1);
+  }
+
   /* Status Cards */
   .status-card {
     background-color: white;
@@ -660,12 +806,12 @@
   }
   
   .btn-success {
-    background-color: var(--danger-color);
+    background-color: var(--success-color); /* Corrected: Success color */
     color: white;
   }
-  
+
   .btn-danger {
-    background-color: var(--success-color);
+    background-color: var(--danger-color); /* Corrected: Danger color */
     color: white;
   }
   
@@ -685,7 +831,60 @@
   .btn:hover {
     opacity: 0.9;
   }
-  
+
+  /* General Action Buttons (used in tables and cards) */
+  .action-buttons {
+    display: inline-flex; /* Use inline-flex for centering/gap */
+    gap: 8px; /* Space between buttons */
+    justify-content: center; /* Center if needed */
+    align-items: center;
+  }
+
+  .action-btn {
+    background: none;
+    border: 1px solid transparent; /* Start transparent */
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    display: inline-flex; /* Align icon */
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .action-btn svg { /* Style icon inside */
+    font-size: 1em; /* Match button font size */
+  }
+
+  .action-btn-edit {
+    color: var(--info-color);
+    border-color: var(--info-color);
+  }
+  .action-btn-edit:hover {
+    background-color: rgba(23, 162, 184, 0.1); /* Light info background */
+    color: #117a8b; /* Darker info */
+  }
+
+  .action-btn-control {
+      color: var(--secondary-color);
+      border-color: var(--secondary-color);
+  }
+  .action-btn-control:hover {
+      background-color: rgba(108, 117, 125, 0.1); /* Light secondary background */
+      color: #545b62; /* Darker secondary */
+  }
+
+  .action-btn-delete {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+  }
+   .action-btn-delete:hover {
+    background-color: rgba(220, 53, 69, 0.1); /* Light danger background */
+    color: #bd2130; /* Darker danger */
+  }
+
   /* Estilos para o gráfico de atividade diária */
 
 .chart-placeholder {

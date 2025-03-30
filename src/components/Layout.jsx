@@ -33,16 +33,23 @@ function Layout({ children }) {
 
     // Determine the effective collapsed state for the Sidebar component
     // It should only be collapsed if the desktop state is collapsed AND the mobile menu is NOT open
-    const sidebarEffectiveCollapsed = isSidebarCollapsed && !isMobileMenuOpen;
+    // Determine the effective collapsed state for the Sidebar component
+    // It should only be collapsed if the desktop state is collapsed AND the mobile menu is NOT open
+    // const sidebarEffectiveCollapsed = isSidebarCollapsed && !isMobileMenuOpen; // Removed intermediate variable
 
     return (
         <div className={appContainerClasses}>
-            {/* Pass the calculated effective collapsed state */}
-            <Sidebar isCollapsed={sidebarEffectiveCollapsed} onToggleSidebar={toggleSidebar} />
-
-            {/* Mobile Overlay - closes menu on click */}
-            {isMobileMenuOpen && <div className="mobile-overlay" onClick={closeMobileMenu}></div>}
-
+            {/* Pass the calculated effective collapsed state directly */}
+            <Sidebar 
+                isCollapsed={isSidebarCollapsed && !isMobileMenuOpen} 
+                onToggleSidebar={toggleSidebar} 
+            />
+            
+            {/* Overlay para fechar o menu quando clicado fora (apenas mobile) */}
+            {isMobileMenuOpen && (
+                <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
+            )}
+            
             <main className="main-content">
                 <Header
                     /* onToggleSidebar removed from Header */
