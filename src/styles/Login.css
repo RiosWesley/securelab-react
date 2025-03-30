@@ -1,0 +1,156 @@
+/* src/styles/Login.css */
+
+.login-page-wrapper { /* New wrapper for centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f7fb; /* Match original body style */
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    background-color: white;
+    /* Use var() for consistency if defined in styles.css */
+    border-radius: var(--card-border-radius, 10px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    /* Styles for <i> and <span> are inline in JSX for now,
+       or could be moved here if FontAwesome components are used */
+}
+
+.login-header h2 {
+    font-size: 1.1rem;
+    color: #333; /* Or var(--dark-color) */
+    font-weight: 600;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333; /* Or var(--dark-color) */
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4a6cf7; /* Or var(--primary-color) */
+}
+
+.btn-login {
+    padding: 12px;
+    background-color: #4a6cf7; /* Or var(--primary-color) */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex; /* For icon alignment */
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-login:hover {
+    background-color: #3959d9; /* Darker shade */
+}
+
+.btn-login:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.forgot-password {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.forgot-password a {
+    color: #4a6cf7; /* Or var(--primary-color) */
+    text-decoration: none;
+}
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    /* display: none; /* Handled by conditional rendering in React */
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545; /* Or var(--danger-color) */
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+/* Dark Mode Adjustments (if using dark-mode.css globally) */
+/* Example: You might need to copy relevant rules from dark-mode.css here
+   or ensure dark-mode.css is imported globally */
+html[data-theme="dark"] .login-page-wrapper {
+    background-color: #1a1d2a; /* Match dark body style */
+}
+
+html[data-theme="dark"] .login-container {
+    background-color: #232736;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .login-header h2,
+html[data-theme="dark"] .form-group label {
+    color: #f0f2f5;
+}
+
+html[data-theme="dark"] .form-control {
+    background-color: #1e2130;
+    border-color: #3b4254;
+    color: #f0f2f5;
+}
+
+html[data-theme="dark"] .form-control:focus {
+    border-color: #5d7bf7; /* Lighter primary for dark */
+}
+
+html[data-theme="dark"] .forgot-password a {
+    color: #5d7bf7;
+}
+
+html[data-theme="dark"] .alert-danger {
+    background-color: rgba(232, 83, 94, 0.2);
+    border-color: rgba(232, 83, 94, 0.3);
+    color: #e8535e; /* Lighter danger for dark */
+}

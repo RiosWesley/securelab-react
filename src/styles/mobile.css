@@ -1,0 +1,236 @@
+/* mobile.css - Otimizações para dispositivos móveis */
+
+/* Elementos adicionais para suporte mobile - IMPORTANTE: Definir antes das media queries */
+.mobile-menu-toggle {
+    display: none; /* Oculto por padrão, visível apenas em media queries */
+    position: absolute;
+    z-index: 1060;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .mobile-overlay {
+    display: none; /* Oculto por padrão, visível apenas em media queries */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+  }
+  
+  /* Garantir que o overlay esteja sempre ativado em mobile */
+  @media (max-width: 768px) {
+    .show-mobile-menu .mobile-overlay {
+      display: block !important;
+    }
+  }
+  
+  /* Ajustes globais para melhor experiência em telas pequenas */
+  @media (max-width: 768px) {
+    /* Melhorias gerais */
+    body {
+      font-size: 14px; /* Texto ligeiramente menor em dispositivos móveis */
+    }
+  
+    /* Adicionar botão de menu mobile - SEMPRE VISÍVEL em mobile */
+    .mobile-menu-toggle {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    /* Ajuste da sidebar para mobile */
+    .sidebar {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      z-index: 1050;
+      width: 85%;
+      max-width: 280px;
+      height: 100%;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+  
+    .app-container.show-mobile-menu .sidebar {
+      transform: translateX(0);
+    }
+  
+    .show-mobile-menu .mobile-overlay {
+      display: block;
+    }
+  
+    /* Melhorias no header para mobile */
+    .main-header {
+      padding: 0 10px;
+      height: 56px;
+    }
+  
+    .header-search {
+      display: none; /* Oculta busca em mobile para economizar espaço */
+    }
+  
+    /* Ajustes no conteúdo */
+    .main-content {
+      margin-left: 0 !important; /* Força margem zero independente do estado da sidebar */
+    }
+  
+    .content-wrapper {
+      padding: 15px 10px;
+    }
+  
+    /* Ajustes em cabeçalhos de página */
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+  
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+  
+    /* Ajustes em cards */
+    .card-header {
+      padding: 10px 15px;
+    }
+  
+    .card-body {
+      padding: 15px;
+    }
+  
+    /* Tabelas responsivas */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 1rem;
+    }
+  
+    .table {
+      min-width: 650px; /* Força rolagem horizontal */
+    }
+  
+    .table th,
+    .table td {
+      padding: 10px 8px;
+      white-space: nowrap;
+    }
+  
+    /* Ajustes nos modais */
+    .modal-dialog {
+      margin: 10px;
+      width: calc(100% - 20px);
+    }
+  
+    .modal-body {
+      padding: 15px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+  
+    /* Ajustes nos formulários */
+    .form-group {
+      margin-bottom: 12px;
+    }
+  
+    /* Ajustes nos botões para melhor toque */
+    .btn {
+      padding: 8px 12px;
+      min-height: 38px;
+    }
+  
+    .icon-button, 
+    .action-btn {
+      padding: 8px;
+      min-width: 38px;
+      min-height: 38px;
+    }
+  
+    /* Ajustes na paginação */
+    .pagination-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .pagination-info {
+      margin-bottom: 10px;
+    }
+  
+    /* Melhorias na notificação */
+    .notification-container {
+      max-width: 90%;
+      width: 300px;
+    }
+  }
+  
+  /* Ajustes para telas muito pequenas (smartphones) */
+  @media (max-width: 480px) {
+  
+  
+    .card-grid {
+      gap: 12px;
+    }
+  
+    /* Tornar os status-card mais compactos */
+    .status-card {
+      padding: 12px;
+    }
+  
+    .status-count {
+      font-size: 1.5rem;
+    }
+  
+    /* Melhorar visualização de listas em telas pequenas */
+    .activity-list li,
+    .door-list li,
+    .alerts-list li {
+      padding: 10px 0;
+    }
+  
+    .activity-icon,
+    .alert-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+    }
+  }
+/* In mobile.css */
+@media (max-width: 768px) {
+  .sidebar-toggle-desktop {
+    display: none !important; /* Hide desktop toggle on mobile */
+  }
+  /* Ensure mobile toggle is shown (already likely in your mobile.css) */
+  .mobile-menu-toggle {
+    display: flex !important;
+    /* Adjust positioning as needed, remove absolute if it's directly in header */
+    /* position: absolute;
+    top: 10px;
+    right: 10px; */
+    z-index: 1060; /* Ensure it's clickable */
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .main-header {
+    position: relative; /* Needed if mobile toggle uses absolute */
+    display: flex; /* Ensure items align */
+    justify-content: space-between; /* Push toggle left, right content right */
+    align-items: center;
+  }
+  .main-header .header-right {
+    margin-left: auto; /* Push right content to the end */
+  }

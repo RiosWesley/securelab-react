@@ -1,0 +1,402 @@
+/* dark-mode.css - Implementação otimizada do modo escuro para SecureLab 2.0 */
+
+/* Redefinição das variáveis de cor para o modo escuro */
+html[data-theme="dark"] {
+    /* Cores principais - substituições para o modo escuro */
+    --primary-color: #5d7bf7; /* Azul mais claro para melhor contraste */
+    --secondary-color: #a7acb1; /* Cinza mais claro */
+    --success-color: #3eca5d; /* Verde mais brilhante */
+    --danger-color: #e8535e; /* Vermelho mais brilhante */
+    --warning-color: #ffce3a; /* Amarelo mais brilhante */
+    --info-color: #29c7d8; /* Azul claro mais brilhante */
+    --light-color: #2c3144; /* Escuro, mas não tão escuro quanto o fundo */
+    --dark-color: #f0f2f5; /* Invertido para textos claros */
+    
+    /* Cores específicas do modo escuro */
+    --dark-bg-color: #1a1d2a; /* Cor de fundo principal - mais escura para maior contraste */
+    --dark-card-bg: #232736; /* Fundo de cards, elementos de UI */
+    --dark-log-bg: #232736; /* Fundo de log, elementos de UI */
+    --dark-text-primary: #f0f2f5; /* Texto principal */
+    --dark-text-secondary: #c9cdd4; /* Texto secundário */
+    --dark-border-color: #3b4254; /* Cor de bordas */
+    --dark-input-bg: #1e2130; /* Fundo de campos de input */
+    --dark-hover-color: #353b50; /* Cor de hover */
+    
+    /* Cores específicas para as tabelas */
+    --dark-table-header: #2a2f40; /* Cabeçalho da tabela */
+    --dark-table-row: #232736; /* Linha padrão da tabela */
+    --dark-table-row-even: #282d3d; /* Linha alternada da tabela */
+    --dark-table-hover: #323749; /* Cor ao passar o mouse sobre a linha */
+}
+
+/* Estilos base para o modo escuro */
+html[data-theme="dark"] body {
+    background-color: var(--dark-bg-color);
+    color: var(--dark-text-primary);
+}
+
+/* ===== CORREÇÃO: PÁGINA DE LOGIN ===== */
+html[data-theme="dark"] .login-container {
+    background-color: var(--dark-card-bg);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .login-header h2,
+html[data-theme="dark"] .form-group label {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .logo i,
+html[data-theme="dark"] .logo span {
+    color: var(--primary-color);
+}
+
+html[data-theme="dark"] .form-control {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(93, 123, 247, 0.25);
+}
+
+html[data-theme="dark"] .forgot-password a {
+    color: var(--primary-color);
+}
+
+html[data-theme="dark"] .alert-danger {
+    background-color: rgba(232, 83, 94, 0.2);
+    border-color: rgba(232, 83, 94, 0.3);
+    color: var(--danger-color);
+}
+
+/* ===== CORREÇÃO: STATUS DAS PORTAS ===== */
+/* Correção para indicadores de status das portas */
+html[data-theme="dark"] [style*="color: #e74c3c"],
+html[data-theme="dark"] [style*="color: #dc3545"] {
+    color: var(--danger-color) !important;
+}
+
+html[data-theme="dark"] [style*="color: #2ecc71"],
+html[data-theme="dark"] [style*="color: #28a745"] {
+    color: var(--success-color) !important;
+}
+
+/* Correção específica para status badges na página de portas */
+html[data-theme="dark"] .status-badge.badge-danger,
+html[data-theme="dark"] .status-locked {
+    background-color: rgba(232, 83, 94, 0.2) !important;
+    color: var(--danger-color) !important;
+}
+
+html[data-theme="dark"] .status-badge.badge-success,
+html[data-theme="dark"] .status-unlocked {
+    background-color: rgba(62, 202, 93, 0.2) !important;
+    color: var(--success-color) !important;
+}
+
+/* Correção para os ícones nas células da tabela */
+html[data-theme="dark"] .table td span[style*="color: #e74c3c"] i,
+html[data-theme="dark"] .table td span[style*="color: #dc3545"] i {
+    color: var(--success-color) !important;
+}
+
+html[data-theme="dark"] .table td span[style*="color: #2ecc71"] i,
+html[data-theme="dark"] .table td span[style*="color: #28a745"] i {
+    color: var(--danger-color) !important;
+}
+
+/* Correção para o texto junto aos ícones */
+html[data-theme="dark"] .table td span[style*="color: #e74c3c"],
+html[data-theme="dark"] .table td span[style*="color: #dc3545"] {
+    color: var(--success-color) !important;
+}
+
+html[data-theme="dark"] .table td span[style*="color: #2ecc71"],
+html[data-theme="dark"] .table td span[style*="color: #28a745"] {
+    color: var(--danger-color) !important;
+}
+
+/* Status de portas no dashboard */
+html[data-theme="dark"] .door-status.locked {
+    background-color: rgba(62, 202, 93, 0.2);
+    color: var(--success-color);
+}
+
+html[data-theme="dark"] .door-status.unlocked {
+    background-color: rgba(232, 83, 94, 0.2);
+    color: var(--danger-color);
+}
+
+/* Ajuste para os dots que indicam status */
+html[data-theme="dark"] .status-dot.locked {
+    background-color: var(--danger-color);
+}
+
+html[data-theme="dark"] .status-dot.unlocked {
+    background-color: var(--success-color);
+}
+
+/* ===== AJUSTES PARA OUTROS ELEMENTOS DA INTERFACE ===== */
+/* Sidebar e header */
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .main-header {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .sidebar-nav li a {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .sidebar-nav li a:hover,
+html[data-theme="dark"] .sidebar-nav li.active a {
+    background-color: rgba(93, 123, 247, 0.1);
+    color: var(--primary-color);
+}
+
+html[data-theme="dark"] .sidebar-footer a {
+    color: var(--dark-text-secondary);
+}
+
+/* Formulários e inputs */
+html[data-theme="dark"] .header-search {
+    background-color: var(--dark-input-bg);
+}
+
+html[data-theme="dark"] .header-search input {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .header-search i {
+    color: var(--dark-text-secondary);
+}
+
+/* Cards e tabelas */
+html[data-theme="dark"] .log,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .status-card {
+    background-color: var(--dark-card-bg);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="dark"] .card-header {
+    border-bottom-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .card-header h3 {
+    color: var(--dark-text-primary);
+}
+
+/* Correção específica para a tabela de portas */
+html[data-theme="dark"] .table {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .table th {
+    background-color: #2a2f40;
+    color: var(--dark-text-primary);
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .table td {
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-primary);
+}
+
+/* Correção para as linhas alternadas */
+html[data-theme="dark"] .table tbody tr {
+    background-color: #232736;
+}
+
+html[data-theme="dark"] .table tbody tr:nth-child(even) {
+    background-color: #282d3d;
+}
+
+html[data-theme="dark"] .table tbody tr:hover {
+    background-color: #323749;
+}
+
+/* Status cards no dashboard */
+html[data-theme="dark"] .status-card-header h3 {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .status-count {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .status-label {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .status-period {
+    color: var(--dark-text-secondary);
+}
+
+/* Modais */
+html[data-theme="dark"] .modal-content {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .modal-header,
+html[data-theme="dark"] .modal-footer {
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .modal-header h3 {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .modal-title,
+html[data-theme="dark"] #modalTitle,
+html[data-theme="dark"] #controlModalTitle,
+html[data-theme="dark"] #confirm-modal-title,
+html[data-theme="dark"] #user-modal-title {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .close-button {
+    color: var(--dark-text-secondary);
+}
+
+/* Corrigir inputs em modais */
+html[data-theme="dark"] .modal-body .form-control {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .modal-body .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(93, 123, 247, 0.25);
+}
+
+html[data-theme="dark"] .modal-body label {
+    color: var(--dark-text-primary);
+}
+
+/* Notificações */
+html[data-theme="dark"] .notification {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-text-primary);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Botões */
+html[data-theme="dark"] .btn-outline-secondary {
+    color: var(--dark-text-secondary);
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .btn-outline-secondary:hover {
+    background-color: var(--dark-hover-color);
+    color: var(--dark-text-primary);
+}
+
+/* Paginação */
+html[data-theme="dark"] .pagination-info {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .pagination-btn,
+html[data-theme="dark"] .page-number {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .pagination-btn:hover:not(:disabled),
+html[data-theme="dark"] .page-number:hover:not(.active) {
+    background-color: var(--dark-hover-color);
+}
+
+html[data-theme="dark"] .page-number.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Dropdown */
+html[data-theme="dark"] .dropdown-menu {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .dropdown-item {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--dark-hover-color);
+}
+
+/* Chart.js - ajustes para gráficos */
+html[data-theme="dark"] .chart-placeholder {
+    background-color: var(--dark-card-bg);
+}
+
+html[data-theme="dark"] canvas {
+    filter: brightness(0.9) contrast(1.1);
+}
+
+/* Correção para legendas do gráfico de atividade diária */
+html[data-theme="dark"] .chart-legend span {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Sempre garantir que as legendas nos gráficos sejam legíveis */
+html[data-theme="dark"] canvas + ul li span {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Correção específica para as legendas de gráficos no dashboard */
+html[data-theme="dark"] .chartjs-legend {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Ajustes para legendas abaixo do gráfico */
+html[data-theme="dark"] #activityChart ~ div,
+html[data-theme="dark"] .chart-js-legend {
+    color: var(--dark-text-primary) !important;
+}
+
+/* Correção para o gráfico de donut */
+html[data-theme="dark"] .donut-hole {
+    background-color: var(--dark-card-bg);
+}
+
+html[data-theme="dark"] .donut-text {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .donut-ring {
+    background-color: #3b4254;
+}
+
+/* Estilos de modo escuro para Gemini */
+html[data-theme="dark"] #gemini-toggle-btn {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] #gemini-toggle-btn:hover {
+    color: var(--primary-color);
+}
+
+/* Cor para números e estado de dispositivos */
+html[data-theme="dark"] .stat-value, 
+html[data-theme="dark"] .stat-label,
+html[data-theme="dark"] #device-percentage,
+html[data-theme="dark"] #device-donut-segment {
+    color: var(--dark-text-primary);
+}
+
+/* Ajustes para dispositivos mobile */
+@media (max-width: 768px) {
+    html[data-theme="dark"] .mobile-overlay {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+}

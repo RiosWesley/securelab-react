@@ -1,0 +1,511 @@
+/*
+ * gemini-insights.css - Estilos para o componente de insights do Gemini
+ * Exibe insights e recomendações inteligentes na dashboard
+ */
+
+/* Container principal de insights */
+.gemini-insights-panel {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cabeçalho */
+.gemini-insights-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: #f5f7ff;
+    border-bottom: 1px solid #e9e9f0;
+}
+
+.gemini-insights-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.gemini-insights-header h3 i {
+    color: #4a6cf7;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.gemini-insights-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.gemini-insights-refresh {
+    background-color: transparent;
+    color: #6c757d;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gemini-insights-refresh:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #4a6cf7;
+}
+
+/* Corpo do painel */
+.gemini-insights-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+/* Resumo dos insights */
+.gemini-insights-summary {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e9e9f0;
+    position: relative;
+    min-height: 70px;
+}
+
+.gemini-insights-summary-content {
+    display: flex;
+    align-items: center;
+}
+
+.gemini-insights-summary-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f0f4ff;
+    color: #4a6cf7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.gemini-insights-summary-icon i {
+    font-size: 18px;
+}
+
+.gemini-insights-summary p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.4;
+}
+
+/* Indicador de carregamento */
+.gemini-insights-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.gemini-insights-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f0f4ff;
+    border-top: 3px solid #4a6cf7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.gemini-insights-loading p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Lista de insights */
+.gemini-insights-list {
+    padding: 0;
+}
+
+.gemini-insight {
+    padding: 15px 20px;
+    display: flex;
+    border-bottom: 1px solid #f0f2f5;
+    transition: background-color 0.2s;
+}
+
+.gemini-insight:hover {
+    background-color: #f9fafc;
+}
+
+.gemini-insight:last-child {
+    border-bottom: none;
+}
+
+.gemini-insight-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.gemini-insight-anomaly .gemini-insight-icon {
+    background-color: #fff6f6;
+    color: #dc3545;
+}
+
+.gemini-insight-pattern .gemini-insight-icon {
+    background-color: #f0f8ff;
+    color: #0d6efd;
+}
+
+.gemini-insight-recommendation .gemini-insight-icon {
+    background-color: #f7f9ff;
+    color: #4a6cf7;
+}
+
+.gemini-insight-error .gemini-insight-icon {
+    background-color: #fff6f6;
+    color: #dc3545;
+}
+
+.gemini-insight-content {
+    flex: 1;
+}
+
+.gemini-insight-title {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.gemini-insight-description-content {
+    margin: 5px 0 8px 0; /* Ajuste a margem superior se necessário */
+    font-size: 13px;
+    color: #666; /* Ou use variável CSS: var(--text-secondary); */
+    line-height: 1.4;
+}
+/* Estilos para elementos DENTRO do container */
+.gemini-insight-description-content p {
+    margin-bottom: 8px; /* Espaçamento entre parágrafos */
+}
+.gemini-insight-description-content p:last-child {
+    margin-bottom: 0; /* Remove margem do último parágrafo */
+}
+
+.gemini-insight-description-content ul,
+.gemini-insight-description-content ol {
+    margin-top: 5px;
+    margin-bottom: 8px;
+    padding-left: 20px; /* Indentação padrão da lista */
+}
+
+.gemini-insight-description-content li {
+    margin-bottom: 4px; /* Espaçamento entre itens da lista */
+}
+
+/* Estilos para Markdown (opcional, mas bom ter) */
+.gemini-insight-description-content strong {
+    font-weight: 600; /* Ou use variável CSS */
+}
+.gemini-insight-description-content em {
+    font-style: italic;
+}
+.gemini-insight-description-content code {
+    background-color: rgba(0, 0, 0, 0.06); /* Ou variável */
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #e91e63; /* Ou variável */
+}
+.gemini-insight-description-content pre { /* Para blocos de código se usados */
+    margin: 10px 0;
+    /* Estilos completos de gemini-assistant.css para .gemini-code-block podem ser aplicados aqui */
+    background-color: #f5f7fc;
+    padding: 10px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    border: 1px solid #e1e4ea;
+}
+.gemini-insight-related {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.gemini-insight-tag {
+    padding: 3px 8px;
+    background-color: #f0f2f5;
+    color: #666;
+    border-radius: 12px;
+    font-size: 11px;
+}
+
+/* Prioridade dos insights */
+.gemini-priority-high .gemini-insight-title {
+    color: #dc3545;
+}
+
+.gemini-priority-high .gemini-insight-title::after {
+    content: "!";
+    background-color: #dc3545;
+    color: white;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-left: 5px;
+    vertical-align: top;
+}
+
+.gemini-priority-medium .gemini-insight-title {
+    color: #fd7e14;
+}
+
+/* Mensagem sem insights */
+.gemini-no-insights {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* Mensagem de erro */
+.gemini-insights-error {
+    display: flex;
+    align-items: center;
+    color: #dc3545;
+}
+
+.gemini-insights-error i {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.gemini-insights-error p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Rodapé */
+.gemini-insights-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background-color: #f9fafc;
+    border-top: 1px solid #e9e9f0;
+    font-size: 12px;
+}
+
+.gemini-insights-updated {
+    color: #6c757d;
+}
+
+.gemini-insights-more {
+    color: #4a6cf7;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.gemini-insights-more i {
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.gemini-insights-more:hover {
+    text-decoration: underline;
+}
+
+/* Modo escuro */
+html.dark-mode .gemini-insights-panel {
+    background-color: #232736;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .gemini-insights-header {
+    background-color: #2a304d;
+    border-bottom-color: #3b4254;
+}
+
+html.dark-mode .gemini-insights-header h3 {
+    color: #f0f2f5;
+}
+
+html.dark-mode .gemini-insights-refresh {
+    color: #a7acb1;
+}
+
+html.dark-mode .gemini-insights-refresh:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #5d7bf7;
+}
+
+html.dark-mode .gemini-insights-summary {
+    border-bottom-color: #3b4254;
+}
+
+html.dark-mode .gemini-insights-summary-icon {
+    background-color: #2a304d;
+}
+
+html.dark-mode .gemini-insights-summary p {
+    color: #f0f2f5;
+}
+
+html.dark-mode .gemini-insights-loading {
+    background-color: rgba(35, 39, 54, 0.9);
+}
+
+html.dark-mode .gemini-insights-spinner {
+    border-color: #3b4254;
+    border-top-color: #5d7bf7;
+}
+
+html.dark-mode .gemini-insights-loading p {
+    color: #c9cdd4;
+}
+
+html.dark-mode .gemini-insight {
+    border-bottom-color: #3b4254;
+}
+
+html.dark-mode .gemini-insight:hover {
+    background-color: #2a2c3a;
+}
+
+html.dark-mode .gemini-insight-anomaly .gemini-insight-icon {
+    background-color: #3a2a2a;
+    color: #e8535e;
+}
+
+html.dark-mode .gemini-insight-pattern .gemini-insight-icon {
+    background-color: #2a3244;
+    color: #5d7bf7;
+}
+
+html.dark-mode .gemini-insight-recommendation .gemini-insight-icon {
+    background-color: #2a304d;
+    color: #5d7bf7;
+}
+
+html.dark-mode .gemini-insight-error .gemini-insight-icon {
+    background-color: #3a2a2a;
+    color: #e8535e;
+}
+
+html.dark-mode .gemini-insight-title {
+    color: #f0f2f5;
+}
+
+/* Adaptações para Modo Escuro (Aplique o mesmo padrão) */
+html.dark-mode .gemini-insight-description-content {
+    color: #c9cdd4; /* Ou var(--dark-text-secondary); */
+}
+html.dark-mode .gemini-insight-description-content code {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ff4081; /* Ou var(--dark-accent-pink); */
+}
+html.dark-mode .gemini-insight-description-content pre {
+    background-color: #2a2c3a;
+    border-color: #3b4254;
+    color: #e0e0e0;
+}
+
+html.dark-mode .gemini-insight-tag {
+    background-color: #2a2c3a;
+    color: #c9cdd4;
+}
+
+html.dark-mode .gemini-priority-high .gemini-insight-title {
+    color: #e8535e;
+}
+
+html.dark-mode .gemini-priority-medium .gemini-insight-title {
+    color: #ff9c52;
+}
+
+html.dark-mode .gemini-no-insights {
+    color: #a7acb1;
+}
+
+html.dark-mode .gemini-insights-error {
+    color: #e8535e;
+}
+
+html.dark-mode .gemini-insights-footer {
+    background-color: #1a1d2a;
+    border-top-color: #3b4254;
+}
+
+html.dark-mode .gemini-insights-updated {
+    color: #a7acb1;
+}
+
+html.dark-mode .gemini-insights-more {
+    color: #5d7bf7;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .gemini-insights-panel {
+        border-radius: 8px;
+    }
+
+    .gemini-insights-header,
+    .gemini-insights-summary,
+    .gemini-insight {
+        padding: 12px 15px;
+    }
+
+    .gemini-insights-summary-icon,
+    .gemini-insight-icon {
+        width: 28px;
+        height: 28px;
+        margin-right: 10px;
+    }
+
+    .gemini-insights-summary p,
+    .gemini-insight-description {
+        font-size: 12px;
+    }
+
+    .gemini-insight-title {
+        font-size: 13px;
+    }
+}

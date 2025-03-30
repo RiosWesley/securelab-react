@@ -1,0 +1,190 @@
+/* Estilos para o painel de benchmark */
+.benchmark-container {
+    margin: 25px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .benchmark-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .benchmark-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .benchmark-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .benchmark-label {
+    width: 100px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--dark-color);
+  }
+  
+  .benchmark-label i {
+    width: 16px;
+    color: var(--primary-color);
+  }
+  
+  .benchmark-bar-container {
+    flex: 1;
+    height: 12px;
+    background-color: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .benchmark-bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s ease;
+  }
+  
+  /* Cores diferentes para cada métrica */
+  #cpu-usage-bar {
+    background-color: #4a6cf7; /* Azul */
+  }
+  
+  #ram-usage-bar {
+    background-color: #2ecc71; /* Verde */
+  }
+  
+  #temp-value-bar {
+    background-color: #e74c3c; /* Vermelho */
+  }
+  
+  #latency-value-bar {
+    background-color: #f39c12; /* Laranja */
+  }
+  
+  .benchmark-value {
+    position: absolute;
+    right: 8px;
+    top: -3px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark-color);
+  }
+  
+  /* Dispositivo mais sobrecarregado */
+  .hotspot-device {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: rgba(231, 76, 60, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hotspot-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-color);
+    margin-bottom: 5px;
+  }
+  
+  .hotspot-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  #hotspot-device-name {
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  #hotspot-device-load {
+    padding: 2px 8px;
+    background-color: rgba(231, 76, 60, 0.2);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e74c3c;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .benchmark-label {
+      width: 80px;
+      font-size: 0.85rem;
+    }
+    
+    .benchmark-value {
+      font-size: 0.75rem;
+    }
+  }
+  
+  /* Tema escuro */
+  html.dark-mode .benchmark-container {
+    background-color: var(--dark-card-bg);
+  }
+  
+  html.dark-mode .benchmark-title,
+  html.dark-mode .benchmark-label {
+    color: var(--dark-text-primary);
+  }
+  
+  html.dark-mode .benchmark-bar-container {
+    background-color: var(--dark-input-bg);
+  }
+  
+  html.dark-mode .benchmark-value {
+    color: var(--dark-text-primary);
+  }
+  
+  html.dark-mode .hotspot-device {
+    background-color: rgba(231, 76, 60, 0.15);
+  }
+  
+  html.dark-mode .hotspot-title {
+    color: var(--dark-text-primary);
+  }
+  
+  html.dark-mode #hotspot-device-load {
+    background-color: rgba(231, 76, 60, 0.25);
+  }
+
+  /* Classes de criticidade para barras de benchmark */
+.benchmark-bar.normal {
+    opacity: 0.9;
+  }
+  
+  .benchmark-bar.warning {
+    opacity: 1;
+    background-image: linear-gradient(45deg, 
+      rgba(0, 0, 0, 0.15) 25%, 
+      transparent 25%, 
+      transparent 50%, 
+      rgba(0, 0, 0, 0.15) 50%, 
+      rgba(0, 0, 0, 0.15) 75%, 
+      transparent 75%, 
+      transparent);
+    background-size: 10px 10px;
+  }
+  
+  .benchmark-bar.critical {
+    opacity: 1;
+    animation: pulse-critical 1.5s infinite;
+  }
+  
+  @keyframes pulse-critical {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }

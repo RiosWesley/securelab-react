@@ -1,0 +1,22 @@
+{
+  "rules": {
+    // Acesso público temporário para desenvolvimento - MUITO INSEGURO!
+    ".read": true,
+    ".write": true,
+
+    // Índices necessários para as queries funcionarem
+    "users": {
+      ".indexOn": ["email", "status", "role", "department"] // Adicione todos que você filtra/ordena
+    },
+    "doors": {
+       ".indexOn": ["name", "status"] // Adicione todos que você filtra/ordena
+    },
+    "devices": {
+       ".indexOn": ["name", "status", "typeCode", "firmware"] // Adicione todos que você filtra/ordena
+    },
+    "access_logs": {
+      ".indexOn": ["timestamp", "user_name", "door_name", "action", "method"] // 'timestamp' é crucial
+    }
+    // Adicione outros nós que precisam de índices aqui
+  }
+}
