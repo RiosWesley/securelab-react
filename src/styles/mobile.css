@@ -3,10 +3,10 @@
 /* Elementos adicionais para suporte mobile - IMPORTANTE: Definir antes das media queries */
 .mobile-menu-toggle {
     display: none; /* Oculto por padrão, visível apenas em media queries */
-    position: absolute;
-    z-index: 1060;
-    top: 10px;
-    right: 10px;
+    /* position: absolute; Removed - Let flexbox handle positioning */
+    z-index: 1060; /* Keep z-index */
+    /* top: 10px; Removed */
+    /* right: 10px; Removed */
     background: none;
     border: none;
     color: var(--secondary-color);
@@ -49,20 +49,42 @@
   
     /* Ajuste da sidebar para mobile */
     .sidebar {
-      position: fixed !important;
+      position: fixed !important; /* Ensure it's fixed for overlay */
       top: 0;
       left: 0;
       z-index: 1050;
-      width: 85%;
-      max-width: 280px;
       height: 100%;
       transform: translateX(-100%);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, width 0s !important; /* Add width transition override */
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      /* Force expanded width when shown on mobile */
+      width: 85% !important; /* Use !important to override potential inline styles or .sidebar-collapsed */
+      max-width: 280px !important;
     }
-  
+
+    /* Force expanded view styles when mobile menu is shown */
     .app-container.show-mobile-menu .sidebar {
       transform: translateX(0);
+    }
+
+    .app-container.show-mobile-menu .sidebar span,
+    .app-container.show-mobile-menu .logo span {
+      display: inline-block !important; /* Force display of text */
+    }
+
+    .app-container.show-mobile-menu .sidebar-nav li a {
+      justify-content: flex-start !important; /* Align items left */
+      padding: 14px 20px !important; /* Restore original padding */
+      margin: 2px 10px !important; /* Restore original margin */
+    }
+
+    .app-container.show-mobile-menu .sidebar-header .logo {
+       flex-grow: 0 !important; /* Reset flex-grow */
+       justify-content: flex-start !important; /* Align logo left */
+    }
+
+    .app-container.show-mobile-menu .sidebar-footer a {
+      justify-content: flex-start !important; /* Align footer items left */
     }
   
     .show-mobile-menu .mobile-overlay {
@@ -73,6 +95,14 @@
     .main-header {
       padding: 0 10px;
       height: 56px;
+      /* Ensure header content aligns correctly with mobile toggle */
+      position: relative; /* Needed if mobile toggle uses absolute */
+      display: flex; /* Ensure items align */
+      justify-content: space-between; /* Push toggle left, right content right */
+      align-items: center;
+    }
+    .main-header .header-right {
+      margin-left: auto; /* Push right content to the end */
     }
   
     .header-search {
@@ -110,6 +140,7 @@
     }
   
     /* Tabelas responsivas */
+    /* The rule for .card-grid is already defined in styles.css @media block */
     .table-responsive {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -171,14 +202,20 @@
       max-width: 90%;
       width: 300px;
     }
+
+    /* Hide desktop toggle on mobile */
+    .sidebar-toggle-desktop {
+      display: none !important; 
+    }
   }
   
   /* Ajustes para telas muito pequenas (smartphones) */
   @media (max-width: 480px) {
   
-  
+    /* .card-grid gap is already adjusted in the 768px media query, 
+       but we can override it here if needed for even smaller screens */
     .card-grid {
-      gap: 12px;
+      gap: 10px; /* Slightly smaller gap for very small screens */
     }
   
     /* Tornar os status-card mais compactos */
@@ -204,33 +241,4 @@
       margin-right: 10px;
     }
   }
-/* In mobile.css */
-@media (max-width: 768px) {
-  .sidebar-toggle-desktop {
-    display: none !important; /* Hide desktop toggle on mobile */
-  }
-  /* Ensure mobile toggle is shown (already likely in your mobile.css) */
-  .mobile-menu-toggle {
-    display: flex !important;
-    /* Adjust positioning as needed, remove absolute if it's directly in header */
-    /* position: absolute;
-    top: 10px;
-    right: 10px; */
-    z-index: 1060; /* Ensure it's clickable */
-    color: var(--secondary-color);
-    font-size: 1.5rem;
-    padding: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .main-header {
-    position: relative; /* Needed if mobile toggle uses absolute */
-    display: flex; /* Ensure items align */
-    justify-content: space-between; /* Push toggle left, right content right */
-    align-items: center;
-  }
-  .main-header .header-right {
-    margin-left: auto; /* Push right content to the end */
-  }
+/* Removed duplicate media query block that was here */

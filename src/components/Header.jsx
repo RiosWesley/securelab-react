@@ -1,4 +1,4 @@
-// src/components/Header.jsx
+ // src/components/Header.jsx
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faBars } from '@fortawesome/free-solid-svg-icons';
@@ -79,10 +79,7 @@ function Header({ onToggleSidebar, onToggleMobileMenu }) {
                 <FontAwesomeIcon icon={faBars} />
             </button>
 
-            {/* Desktop Sidebar Toggle */}
-            <button id="sidebar-toggle" className="icon-button sidebar-toggle-desktop" aria-label="Toggle Sidebar" onClick={onToggleSidebar}>
-                <FontAwesomeIcon icon={faBars} />
-            </button>
+            {/* Desktop Sidebar Toggle - REMOVED FROM HERE, MOVED TO SIDEBAR */}
 
             {/* Optional Search Bar - Add input if needed */}
             {/* <div className="header-search">
@@ -95,6 +92,8 @@ function Header({ onToggleSidebar, onToggleMobileMenu }) {
 
             {/* Right-aligned items */}
             <div className="header-right">
+                {/* Commented-out toggle button removed from here */}
+
                 <ThemeToggleButton /> {/* Theme toggle button */}
 
                 <div className="notifications">
@@ -110,6 +109,7 @@ function Header({ onToggleSidebar, onToggleMobileMenu }) {
                     {/* User dropdown menu can be implemented here */}
                     {/* Example: <img src={userAvatarUrl} alt="User Avatar" className="avatar" /> */}
                 </div>
+                {/* Commented-out toggle button removed from here */}
             </div>
         </header>
     );

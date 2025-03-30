@@ -6,7 +6,7 @@ import GeminiChatPopup from './GeminiChatPopup'; // Import the new chat popup
 // Import Mobile Overlay if needed as a separate component or handle via CSS
 
 function Layout({ children }) {
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true); // Default to collapsed
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -31,16 +31,21 @@ function Layout({ children }) {
         isMobileMenuOpen ? 'show-mobile-menu' : ''
     ].filter(Boolean).join(' '); // Filter out empty strings and join
 
+    // Determine the effective collapsed state for the Sidebar component
+    // It should only be collapsed if the desktop state is collapsed AND the mobile menu is NOT open
+    const sidebarEffectiveCollapsed = isSidebarCollapsed && !isMobileMenuOpen;
+
     return (
         <div className={appContainerClasses}>
-            <Sidebar isCollapsed={isSidebarCollapsed} />
+            {/* Pass the calculated effective collapsed state */}
+            <Sidebar isCollapsed={sidebarEffectiveCollapsed} onToggleSidebar={toggleSidebar} />
 
             {/* Mobile Overlay - closes menu on click */}
             {isMobileMenuOpen && <div className="mobile-overlay" onClick={closeMobileMenu}></div>}
 
             <main className="main-content">
                 <Header
-                    onToggleSidebar={toggleSidebar}
+                    /* onToggleSidebar removed from Header */
                     onToggleMobileMenu={toggleMobileMenu}
                 />
                 <div className="content-wrapper">

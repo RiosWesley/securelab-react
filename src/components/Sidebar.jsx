@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTachometerAlt, faDoorOpen, faUsers, faMicrochip, faClipboardList, faCog, faSignOutAlt, faShieldAlt
+    faTachometerAlt, faDoorOpen, faUsers, faMicrochip, faClipboardList, faCog, faSignOutAlt, faShieldAlt, faBars, faArrowLeft // Added faBars and faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 
 // Re-implement logout logic here or pass down from Layout
@@ -11,7 +11,7 @@ import { auth } from '../firebase/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
-function Sidebar({ isCollapsed }) {
+function Sidebar({ isCollapsed, onToggleSidebar }) { // Receive onToggleSidebar
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -31,7 +31,14 @@ function Sidebar({ isCollapsed }) {
                     <FontAwesomeIcon icon={faShieldAlt} />
                     {!isCollapsed && <span>SecureLab</span>}
                 </div>
-                {/* Toggle button is handled in Layout now */}
+                {/* Add Toggle Button Here */}
+                <button
+                    className="icon-button sidebar-toggle-button" // Added class for styling
+                    aria-label={isCollapsed ? "Expandir Sidebar" : "Recolher Sidebar"}
+                    onClick={onToggleSidebar}
+                >
+                    <FontAwesomeIcon icon={isCollapsed ? faBars : faArrowLeft} />
+                </button>
             </div>
             <nav className="sidebar-nav">
                 <ul>
