@@ -232,6 +232,39 @@
         justify-content: flex-end; /* Alinha botões à direita */
     }
 
+    /* Estilos para a visualização em card de Usuários no mobile */
+    .users-card-list .user-card {
+        border: 1px solid var(--border-color);
+        background-color: var(--card-bg);
+        box-shadow: var(--box-shadow-sm);
+    }
+
+    .users-card-list .user-card .card-body {
+        padding: 15px;
+    }
+
+    .users-card-list .user-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .users-card-list .user-card .card-text {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+        word-break: break-word; /* Break long emails */
+    }
+    .users-card-list .user-card .card-text strong {
+        color: var(--text-color-light);
+    }
+
+    .users-card-list .user-card .action-buttons {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
     /* Ajustes nos modais */
     .modal-dialog {
       margin: 10px;

@@ -400,7 +400,8 @@ function Users() {
                     </div>
                 </div>
                 <div className="card-body">
-                    <div className="table-responsive">
+                    {/* Desktop Table View */}
+                    <div className="table-responsive d-none d-md-block"> {/* Hide on screens smaller than md (768px) */}
                         <table className="table table-hover">
                             <thead>
                             <tr>
@@ -448,7 +449,49 @@ function Users() {
                         </table>
                     </div>
 
-                    {/* Pagination Component */}
+                    {/* Mobile Card View */}
+                    <div className="users-card-list d-md-none"> {/* Show only on screens smaller than md (768px) */}
+                        {loading ? (
+                            <p className="text-center">Carregando...</p>
+                        ) : currentUsersPage.length > 0 ? (
+                            currentUsersPage.map(user => (
+                                <div key={user.id} className="user-card card mb-3">
+                                    <div className="card-body">
+                                        <div className="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 className="card-title mb-0">{user.name}</h5>
+                                            <span className={`badge-status badge-${getStatusClass(user.status)}`}>
+                                                {formatStatus(user.status)}
+                                            </span>
+                                        </div>
+                                        <p className="card-text mb-1">
+                                            <strong>Email:</strong> {user.email}
+                                        </p>
+                                        <p className="card-text mb-1">
+                                            <strong>Depto:</strong> {user.department || '-'}
+                                        </p>
+                                        <p className="card-text mb-1">
+                                            <strong>Função:</strong> {translateRole(user.role)}
+                                        </p>
+                                        <p className="card-text mb-2">
+                                            <strong>Criado em:</strong> {formatDate(user.created_at)}
+                                        </p>
+                                        <div className="action-buttons justify-content-end"> {/* Align buttons right */}
+                                            <button className="action-btn action-btn-edit" onClick={() => openEditUserModal(user)} title="Editar">
+                                                <FontAwesomeIcon icon={faEdit} />
+                                            </button>
+                                            <button className="action-btn action-btn-delete" onClick={() => openConfirmDelete(user)} title="Excluir">
+                                                <FontAwesomeIcon icon={faTrashAlt} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-center">Nenhum usuário encontrado com os filtros aplicados.</p>
+                        )}
+                    </div>
+
+                    {/* Pagination (Common for both views) */}
                     {!loading && filteredUsers.length > PAGE_SIZE && (
                         <Pagination
                             currentPage={currentPage}
