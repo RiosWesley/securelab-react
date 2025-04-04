@@ -44,37 +44,37 @@ function Sidebar({ isCollapsed, onToggleSidebar }) { // Receive onToggleSidebar
                 <ul>
                     <li>
                         <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
-                            <FontAwesomeIcon icon={faTachometerAlt} title={isCollapsed ? "Dashboard" : ""} />
+                            <FontAwesomeIcon icon={faTachometerAlt} className="nav-icon" title={isCollapsed ? "Dashboard" : ""} />
                             {!isCollapsed && <span>Dashboard</span>}
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/doors" className={({ isActive }) => isActive ? "active" : ""}>
-                            <FontAwesomeIcon icon={faDoorOpen} title={isCollapsed ? "Portas" : ""} />
+                            <FontAwesomeIcon icon={faDoorOpen} className="nav-icon" title={isCollapsed ? "Portas" : ""} />
                             {!isCollapsed && <span>Portas</span>}
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/users" className={({ isActive }) => isActive ? "active" : ""}>
-                            <FontAwesomeIcon icon={faUsers} title={isCollapsed ? "Usuários" : ""} />
+                            <FontAwesomeIcon icon={faUsers} className="nav-icon" title={isCollapsed ? "Usuários" : ""} />
                             {!isCollapsed && <span>Usuários</span>}
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/devices" className={({ isActive }) => isActive ? "active" : ""}>
-                            <FontAwesomeIcon icon={faMicrochip} title={isCollapsed ? "Dispositivos" : ""} />
+                            <FontAwesomeIcon icon={faMicrochip} className="nav-icon" title={isCollapsed ? "Dispositivos" : ""} />
                             {!isCollapsed && <span>Dispositivos</span>}
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/logs" className={({ isActive }) => isActive ? "active" : ""}>
-                            <FontAwesomeIcon icon={faClipboardList} title={isCollapsed ? "Logs de Acesso" : ""}/>
+                            <FontAwesomeIcon icon={faClipboardList} className="nav-icon" title={isCollapsed ? "Logs de Acesso" : ""}/>
                             {!isCollapsed && <span>Logs de Acesso</span>}
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/settings" className={({ isActive }) => isActive ? "active" : ""}>
-                            <FontAwesomeIcon icon={faCog} title={isCollapsed ? "Configurações" : ""} />
+                            <FontAwesomeIcon icon={faCog} className="nav-icon" title={isCollapsed ? "Configurações" : ""} />
                             {!isCollapsed && <span>Configurações</span>}
                         </NavLink>
                     </li>

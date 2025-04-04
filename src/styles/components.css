@@ -494,3 +494,11 @@
 .password-toggle:focus{
   outline: none; /* Remove default focus outline */
 }
+
+/* Sidebar Navigation Icon Spacing */
+.sidebar-nav .nav-icon {
+  margin-right: 8px; /* Adjust this value if you want more/less space */
+  width: 1.1em; /* Helps align icons if they have different natural widths */
+  text-align: center; /* Centers the icon within the allocated width */
+  vertical-align: middle; /* Improves vertical alignment with text */
+}
