@@ -16,6 +16,7 @@ import { database, auth } from '../firebase/firebaseConfig';
 import { formatDateTime, getStatusClass, formatStatus } from '../utils/formatters';
 import { showNotification } from '../utils/notifications';
 import GeminiInsights from '../components/GeminiInsights'; // Import GeminiInsights
+import DevicePerformanceCard from '../components/DevicePerformanceCard'; // Import the new card
 
 // Placeholder components if not fully implemented yet
 function DevicePerformancePlaceholder() {
@@ -412,14 +413,9 @@ function Dashboard() {
                         <div className="card device-status-card">
                             <div className="card-header">
                                 <h3>Performance dos Dispositivos</h3>
-                                <div className="card-actions">
-                                    <button className="icon-button" onClick={refreshDeviceStats} title="Atualizar Status Dispositivos">
-                                        <FontAwesomeIcon icon={faSyncAlt} />
-                                    </button>
-                                </div>
                             </div>
                             <div className="card-body">
-                                <DevicePerformancePlaceholder /> {/* Placeholder */}
+                                <DevicePerformanceCard /> {/* Use the actual component */}
                                 <div className="card-actions center">
                                     <a href="/devices" className="btn btn-link">Ver Dispositivos</a>
                                 </div>

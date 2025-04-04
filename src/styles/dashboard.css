@@ -429,6 +429,221 @@ html[data-theme="dark"] .chart-no-data {
     color: var(--dark-text-secondary);
 }
 
+
+/* --- Styles for Device Status Card V2 (Based on Image) --- */
+.device-status-card-v2 {
+    /* Inherits base card styles */
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Gap between sections */
+}
+
+.device-status-card-v2 .card-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0; /* Remove default margin if card has gap */
+}
+
+.device-summary-stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    margin-top: 2px;
+}
+
+.performance-section {
+    padding-top: 10px;
+}
+
+.performance-section h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.perf-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Gap between performance bars */
+}
+
+.perf-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.perf-label {
+    width: 90px; /* Fixed width for label+icon */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--dark-color);
+}
+
+.perf-label .svg-inline--fa { /* Target FontAwesome icon */
+    width: 16px;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.perf-bar-container {
+    flex-grow: 1;
+    height: 10px; /* Thinner bar like image */
+    background-color: var(--border-color); /* Darker background for bar */
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.perf-bar {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+/* --- Performance Bar Colors --- */
+
+/* General 'normal', 'warning', and 'critical' colors */
+.perf-item .perf-bar.normal { background-color: #2ecc71; } /* Green for low usage */
+.perf-item .perf-bar.warning { background-color: #f39c12; } /* Orange/Yellow for medium usage */
+.perf-item .perf-bar.critical { background-color: #e74c3c; } /* Red for high usage */
+
+/* Ensure the bar itself is visible */
+.perf-bar {
+    display: block; /* Make sure it's a block element */
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease, background-color 0.3s ease; /* Added background-color transition */
+}
+
+
+.perf-value {
+    width: 50px; /* Fixed width for value */
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.hotspot-highlight {
+    background-color: rgba(231, 76, 60, 0.1); /* Light red background */
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hotspot-label {
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.hotspot-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hotspot-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.hotspot-usage {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e74c3c; /* Red text */
+    background-color: rgba(231, 76, 60, 0.15);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* Small loading/error states */
+.loading-indicator.small,
+.error-message.small,
+.no-data.small {
+    font-size: 0.9rem;
+    padding: 15px;
+    min-height: 50px; /* Less height */
+}
+
+/* --- Dark Mode for V2 Card --- */
+html[data-theme="dark"] .device-status-card-v2 .card-header {
+    border-bottom-color: var(--dark-border-color);
+}
+html[data-theme="dark"] .device-summary-stats {
+    border-bottom-color: var(--dark-border-color);
+}
+html[data-theme="dark"] .stat-value {
+    color: var(--dark-text-primary);
+}
+html[data-theme="dark"] .stat-label {
+    color: var(--dark-text-secondary);
+}
+html[data-theme="dark"] .performance-section h4 {
+    color: var(--dark-text-secondary);
+}
+html[data-theme="dark"] .perf-label {
+    color: var(--dark-text-primary);
+}
+html[data-theme="dark"] .perf-label .svg-inline--fa {
+    color: var(--dark-primary-color);
+}
+html[data-theme="dark"] .perf-bar-container {
+    background-color: var(--dark-input-bg); /* Darker bar background */
+}
+html[data-theme="dark"] .perf-value {
+    color: var(--dark-text-primary);
+}
+
+/* Dark Mode Bar Colors */
+html[data-theme="dark"] .perf-item .perf-bar.normal { background-color: #27ae60; } /* Darker Green for low usage */
+html[data-theme="dark"] .perf-item .perf-bar.warning { background-color: #f1c40f; } /* Darker Orange/Yellow for medium usage */
+html[data-theme="dark"] .perf-item .perf-bar.critical { background-color: #c0392b; } /* Darker Red for high usage */
+
+
+html[data-theme="dark"] .hotspot-highlight {
+    background-color: rgba(231, 76, 60, 0.2); /* Slightly darker red background */
+}
+html[data-theme="dark"] .hotspot-label {
+    color: var(--dark-text-secondary);
+}
+html[data-theme="dark"] .hotspot-name {
+    color: var(--dark-primary-color);
+}
+html[data-theme="dark"] .hotspot-usage {
+    color: #f5b7b1; /* Lighter red text */
+    background-color: rgba(231, 76, 60, 0.25);
+}
+
 html[data-theme="dark"] .chart-error {
     background-color: rgba(231, 76, 60, 0.15);
     border-color: rgba(231, 76, 60, 0.3);
@@ -446,4 +661,176 @@ html[data-theme="dark"] .recharts-legend-item-text {
 
 html[data-theme="dark"] .recharts-cartesian-axis-tick-value {
     fill: var(--dark-text-secondary) !important; /* Override axis tick color */
+}
+
+/* --- Device Performance Card (Hottest Device) Styles --- */
+/* Reuse .benchmark-container for overall card structure */
+.device-performance-card.benchmark-container {
+    min-height: 250px; /* Ensure minimum height */
+    padding: 15px 20px; /* Adjust padding */
+}
+
+.device-performance-card h3 { /* Title like "Dispositivo Mais Ativo" */
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+    text-align: left; /* Align left */
+}
+
+.hottest-device-details .benchmark-title { /* Device Name */
+    font-size: 1.1rem; /* Make device name slightly larger */
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Reuse .benchmark-metrics for the list of metrics */
+.hottest-device-details .benchmark-metrics {
+    gap: 15px; /* Increase gap between metrics */
+}
+
+/* Styles for individual metric items (non-bar) */
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.metric-icon {
+    width: 16px; /* Fixed width for icons */
+    text-align: center;
+    color: var(--secondary-color);
+}
+
+.metric-label {
+    font-weight: 500;
+    color: var(--dark-color);
+    min-width: 90px; /* Align labels */
+}
+
+.metric-value {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+/* Status badge specific styles */
+.status-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: capitalize;
+    min-width: 80px;
+    text-align: center;
+    display: inline-block;
+    border: 1px solid transparent;
+}
+
+/* Apply colors to status badge */
+.status-badge.text-green-500 { color: #1e8449; background-color: #eafaf1; border-color: #a3e9a4; }
+.status-badge.text-red-500 { color: #922b21; background-color: #fdedec; border-color: #f5b7b1; }
+.status-badge.text-gray-500 { color: #566573; background-color: #f4f6f7; border-color: #d5dbdb; }
+
+/* Color coding for Temp and Latency values */
+.metric-item.temp-warning .metric-value,
+.metric-item.latency-warning .metric-value {
+    color: #b07d12; /* Warning color (e.g., orange/yellow) */
+}
+.metric-item.temp-critical .metric-value,
+.metric-item.latency-critical .metric-value {
+    color: #922b21; /* Critical color (e.g., red) */
+    font-weight: 700;
+}
+.metric-item.temp-warning .metric-icon,
+.metric-item.latency-warning .metric-icon {
+    color: #b07d12;
+}
+.metric-item.temp-critical .metric-icon,
+.metric-item.latency-critical .metric-icon {
+    color: #922b21;
+}
+
+
+/* Styles for benchmark items (CPU/RAM bars) within this card */
+.device-performance-card .benchmark-item {
+    /* Uses existing benchmark styles */
+    margin-bottom: 0; /* Remove extra margin if needed */
+}
+.device-performance-card .benchmark-label {
+    width: 90px; /* Adjust label width if needed */
+    gap: 8px;
+}
+.device-performance-card .benchmark-label span {
+     margin-left: 5px; /* Space between icon and text */
+}
+
+
+/* Loading, Error, No Data states */
+.device-performance-card .loading-indicator,
+.device-performance-card .error-message,
+.device-performance-card .no-data {
+    text-align: center;
+    padding: 30px 15px; /* More padding */
+    color: var(--secondary-color);
+    font-style: italic;
+    flex-grow: 1; /* Allow to take space */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.device-performance-card .error-message {
+    color: var(--danger-color);
+    font-weight: 500;
+    font-style: normal;
+}
+
+
+/* --- Dark Mode --- */
+html[data-theme="dark"] .device-performance-card h3,
+html[data-theme="dark"] .metric-label,
+html[data-theme="dark"] .metric-value {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .hottest-device-details .benchmark-title {
+     color: var(--dark-primary-color); /* Use dark theme primary */
+}
+
+html[data-theme="dark"] .metric-icon {
+    color: var(--dark-text-secondary);
+}
+
+/* Dark mode status badge */
+html[data-theme="dark"] .status-badge.text-green-500 { color: #a3e9a4; background-color: rgba(46, 204, 113, 0.15); border-color: rgba(46, 204, 113, 0.3); }
+html[data-theme="dark"] .status-badge.text-red-500 { color: #f5b7b1; background-color: rgba(231, 76, 60, 0.15); border-color: rgba(231, 76, 60, 0.3); }
+html[data-theme="dark"] .status-badge.text-gray-500 { color: #bdc3c7; background-color: rgba(149, 165, 166, 0.15); border-color: rgba(149, 165, 166, 0.3); }
+
+/* Dark mode Temp/Latency colors */
+html[data-theme="dark"] .metric-item.temp-warning .metric-value,
+html[data-theme="dark"] .metric-item.latency-warning .metric-value {
+    color: #fad7a0; /* Dark warning color */
+}
+html[data-theme="dark"] .metric-item.temp-critical .metric-value,
+html[data-theme="dark"] .metric-item.latency-critical .metric-value {
+    color: #f5b7b1; /* Dark critical color */
+}
+html[data-theme="dark"] .metric-item.temp-warning .metric-icon,
+html[data-theme="dark"] .metric-item.latency-warning .metric-icon {
+    color: #fad7a0;
+}
+html[data-theme="dark"] .metric-item.temp-critical .metric-icon,
+html[data-theme="dark"] .metric-item.latency-critical .metric-icon {
+    color: #f5b7b1;
+}
+
+/* Dark mode loading/error/no-data */
+html[data-theme="dark"] .device-performance-card .loading-indicator,
+html[data-theme="dark"] .device-performance-card .no-data {
+    color: var(--dark-text-secondary);
+}
+html[data-theme="dark"] .device-performance-card .error-message {
+    color: var(--dark-danger-color);
 }
