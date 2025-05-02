@@ -31,7 +31,7 @@ function Users() {
 
     // Form State (could be a separate useReducer/custom hook later)
     const [formData, setFormData] = useState({
-        name: '', email: '', department: '', role: '', status: 'active', password: ''
+        name: '', email: '', department: '', role: '', status: 'active', password: '', rfidTagId: '' // Added rfidTagId
     });
 
     // --- Data Fetching and Filtering ---
@@ -71,7 +71,8 @@ function Users() {
             result = result.filter(user =>
                 (user.name?.toLowerCase() || '').includes(lowerSearchTerm) ||
                 (user.email?.toLowerCase() || '').includes(lowerSearchTerm) ||
-                (user.department?.toLowerCase() || '').includes(lowerSearchTerm)
+                (user.department?.toLowerCase() || '').includes(lowerSearchTerm) ||
+                (user.rfidTagId?.toLowerCase() || '').includes(lowerSearchTerm) // Added RFID to search
             );
         }
 
@@ -124,7 +125,7 @@ function Users() {
 
     const openAddUserModal = () => {
         setCurrentUser(null); // Ensure it's add mode
-        setFormData({ name: '', email: '', department: '', role: '', status: 'active', password: '' }); // Reset form data
+        setFormData({ name: '', email: '', department: '', role: '', status: 'active', password: '', rfidTagId: '' }); // Reset form data including rfidTagId
         setIsPasswordVisible(false); // Reset password visibility
         setIsModalOpen(true);
     };
@@ -137,7 +138,8 @@ function Users() {
             department: user.department || '',
             role: user.role || '',
             status: user.status || 'active',
-            password: '' // Password is not edited here directly
+            password: '', // Password is not edited here directly
+            rfidTagId: user.rfidTagId || '' // Pre-fill rfidTagId
         });
         setIsPasswordVisible(false);
         setIsModalOpen(true);
@@ -146,7 +148,7 @@ function Users() {
     const closeModal = () => {
         setIsModalOpen(false);
         setCurrentUser(null); // Clear editing user on close
-        setFormData({ name: '', email: '', department: '', role: '', status: 'active', password: '' }); // Reset form
+        setFormData({ name: '', email: '', department: '', role: '', status: 'active', password: '', rfidTagId: '' }); // Reset form including rfidTagId
     };
 
     const handleFormInputChange = (event) => {
@@ -160,6 +162,7 @@ function Users() {
         if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) return showNotification('Email inválido', 'error');
         if (!formData.department) return showNotification('Selecione um departamento', 'error');
         if (!formData.role) return showNotification('Selecione uma função', 'error');
+        // Optional: Add validation for rfidTagId format if needed
 
         const userData = {
             name: formData.name.trim(),
@@ -167,6 +170,7 @@ function Users() {
             department: formData.department,
             role: formData.role,
             status: formData.status,
+            rfidTagId: formData.rfidTagId.trim() // Include rfidTagId
         };
 
         setLoading(true); // Indicate saving
@@ -186,6 +190,18 @@ function Users() {
                 // and only update the database record.
                 console.warn("Email change detected, but Auth email update is not implemented in this example.");
             }
+
+             // Check if rfidTagId is being changed and if it already exists (excluding current user)
+             if (userData.rfidTagId && userData.rfidTagId !== (currentUser.rfidTagId || '')) {
+                const rfidQuery = query(ref(database, 'users'), orderByChild('rfidTagId'), equalTo(userData.rfidTagId));
+                const snapshot = await get(rfidQuery);
+                if (snapshot.exists()) {
+                    showNotification('Este ID de RFID já está associado a outro usuário.', 'error');
+                    setLoading(false);
+                    return;
+                }
+            }
+
 
             try {
                 await update(ref(database, `users/${currentUser.id}`), userData);
@@ -214,6 +230,18 @@ function Users() {
                     setLoading(false);
                     return;
                 }
+
+                 // Check if rfidTagId exists for a new user
+                 if (userData.rfidTagId) {
+                    const rfidQuery = query(ref(database, 'users'), orderByChild('rfidTagId'), equalTo(userData.rfidTagId));
+                    const rfidSnapshot = await get(rfidQuery);
+                    if (rfidSnapshot.exists()) {
+                        showNotification('Este ID de RFID já está associado a outro usuário.', 'error');
+                        setLoading(false);
+                        return;
+                    }
+                }
+
 
                 // 1. Create user in Firebase Authentication
                 const userCredential = await createUserWithEmailAndPassword(auth, userData.email, formData.password);
@@ -285,9 +313,9 @@ function Users() {
         console.log(`TODO: Implement ${format} export`);
         if (format === 'csv') {
             // Basic CSV Example
-            const headers = ["Nome", "Email", "Departamento", "Função", "Status", "Criado em"];
+            const headers = ["Nome", "Email", "Departamento", "Função", "Status", "Criado em", "ID RFID"]; // Added ID RFID header
             const rows = filteredUsers.map(u => [
-                u.name, u.email, u.department || '-', translateRole(u.role), formatStatus(u.status), formatDate(u.created_at)
+                u.name, u.email, u.department || '-', translateRole(u.role), formatStatus(u.status), formatDate(u.created_at), u.rfidTagId || '-' // Added rfidTagId
             ]);
             const csvContent = [headers, ...rows]
                 .map(row => row.map(cell => `"${String(cell || '').replace(/"/g, '""')}"`).join(','))
@@ -333,7 +361,7 @@ function Users() {
                             <input
                                 type="text"
                                 id="search-users"
-                                placeholder="Buscar por nome, email, depto..."
+                                placeholder="Buscar por nome, email, depto, RFID..." // Updated placeholder
                                 onChange={handleSearchChange} // Direct change for immediate feedback or use debouncedSearch
                                 style={{ background: 'none', border: 'none', outline: 'none', flex: 1, padding: '7px 0'}}
                             />
@@ -411,13 +439,15 @@ function Users() {
                                 <th>Função</th>
                                 <th>Status</th>
                                 <th>Criado em</th>
+                                <th>ID RFID</th> {/* Added RFID column header */}
                                 <th>Ações</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {loading ? (
-                                <tr><td colSpan="7" className="text-center">Carregando...</td></tr>
-                            ) : currentUsersPage.length > 0 ? (
+                            {loading && (
+                                <tr><td colSpan="8" className="text-center">Carregando...</td></tr>
+                            )}
+                            {!loading && currentUsersPage.length > 0 && (
                                 currentUsersPage.map(user => (
                                     <tr key={user.id}>
                                         <td>{user.name}</td>
@@ -430,6 +460,7 @@ function Users() {
                                                 </span>
                                         </td>
                                         <td>{formatDate(user.created_at)}</td>
+                                        <td>{user.rfidTagId || '-'}</td> {/* Display rfidTagId */}
                                         <td>
                                             <div className="action-buttons">
                                                 <button className="action-btn action-btn-edit" onClick={() => openEditUserModal(user)} title="Editar">
@@ -442,8 +473,9 @@ function Users() {
                                         </td>
                                     </tr>
                                 ))
-                            ) : (
-                                <tr><td colSpan="7" className="text-center">Nenhum usuário encontrado com os filtros aplicados.</td></tr>
+                            )}
+                            {!loading && currentUsersPage.length === 0 && (
+                                <tr><td colSpan="8" className="text-center">Nenhum usuário encontrado com os filtros aplicados.</td></tr>
                             )}
                             </tbody>
                         </table>
@@ -472,6 +504,9 @@ function Users() {
                                         <p className="card-text mb-1">
                                             <strong>Função:</strong> {translateRole(user.role)}
                                         </p>
+                                         <p className="card-text mb-1"> {/* Added RFID to mobile card */}
+                                            <strong>ID RFID:</strong> {user.rfidTagId || '-'}
+                                        </p>
                                         <p className="card-text mb-2">
                                             <strong>Criado em:</strong> {formatDate(user.created_at)}
                                         </p>
@@ -498,7 +533,7 @@ function Users() {
                             totalPages={totalPages}
                             onPageChange={handlePageChange}
                             totalItems={filteredUsers.length}
-                            itemsPerPage={PAGE_SIZE}
+                            itemsPerPage={PAGE_SIZE} // Added itemsPerPage prop
                         />
                     )}
                 </div>
@@ -508,29 +543,53 @@ function Users() {
             <Modal
                 isOpen={isModalOpen}
                 onClose={closeModal}
-                title={currentUser ? 'Editar Usuário' : 'Adicionar Novo Usuário'}
+                title={currentUser ? 'Editar Usuário' : 'Novo Usuário'}
                 footer={
                     <>
-                        <button className="btn btn-outline-secondary" onClick={closeModal}>Cancelar</button>
+                        <button className="btn btn-secondary" onClick={closeModal} disabled={loading}>Cancelar</button>
                         <button className="btn btn-primary" onClick={handleSaveUser} disabled={loading}>
                             {loading ? 'Salvando...' : 'Salvar'}
                         </button>
                     </>
                 }
             >
-                {/* User Form Content */}
-                <form id="user-form" onSubmit={(e) => e.preventDefault()}>
+                <form onSubmit={(e) => { e.preventDefault(); handleSaveUser(); }}>
                     <div className="form-group">
-                        <label htmlFor="modal-user-name">Nome Completo</label>
-                        <input type="text" id="modal-user-name" name="name" className="form-control" value={formData.name} onChange={handleFormInputChange} required />
+                        <label htmlFor="name">Nome</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleFormInputChange}
+                            required
+                        />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="modal-user-email">Email</label>
-                        <input type="email" id="modal-user-email" name="email" className="form-control" value={formData.email} onChange={handleFormInputChange} required />
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            className="form-control"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleFormInputChange}
+                            required
+                            disabled={!!currentUser} // Disable email edit for existing users (due to Auth complexity)
+                        />
+                         {currentUser && <small className="form-text text-muted">O email não pode ser alterado após a criação do usuário.</small>}
                     </div>
                     <div className="form-group">
-                        <label htmlFor="modal-user-department">Departamento</label>
-                        <select id="modal-user-department" name="department" className="form-control" value={formData.department} onChange={handleFormInputChange} required>
+                        <label htmlFor="department">Departamento</label>
+                        <select
+                            className="form-control"
+                            id="department"
+                            name="department"
+                            value={formData.department}
+                            onChange={handleFormInputChange}
+                            required
+                        >
                             <option value="">Selecione...</option>
                             <option value="TI">TI</option>
                             <option value="Pesquisa">Pesquisa</option>
@@ -539,38 +598,72 @@ function Users() {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="modal-user-role">Função</label>
-                        <select id="modal-user-role" name="role" className="form-control" value={formData.role} onChange={handleFormInputChange} required>
+                        <label htmlFor="role">Função</label>
+                        <select
+                            className="form-control"
+                            id="role"
+                            name="role"
+                            value={formData.role}
+                            onChange={handleFormInputChange}
+                            required
+                        >
                             <option value="">Selecione...</option>
                             <option value="admin">Administrador</option>
                             <option value="user">Usuário</option>
                         </select>
                     </div>
+                     <div className="form-group"> {/* Added RFID input field */}
+                        <label htmlFor="rfidTagId">ID do Cartão RFID</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="rfidTagId"
+                            name="rfidTagId"
+                            value={formData.rfidTagId}
+                            onChange={handleFormInputChange}
+                            placeholder="Ex: 08 FA 6A 2D"
+                        />
+                         <small className="form-text text-muted">Opcional. Associe um cartão RFID a este usuário.</small>
+                    </div>
                     <div className="form-group">
-                        <label htmlFor="modal-user-status">Status</label>
-                        <select id="modal-user-status" name="status" className="form-control" value={formData.status} onChange={handleFormInputChange} required>
+                        <label htmlFor="status">Status</label>
+                        <select
+                            className="form-control"
+                            id="status"
+                            name="status"
+                            value={formData.status}
+                            onChange={handleFormInputChange}
+                            required
+                        >
                             <option value="active">Ativo</option>
                             <option value="inactive">Inativo</option>
                         </select>
                     </div>
-                    {/* Password field only for adding new user */}
-                    {!currentUser && (
-                        <div className="form-group" id="password-group">
-                            <label htmlFor="modal-user-password">Senha Inicial</label>
-                            <div className="password-input">
+                    {!currentUser && ( // Only show password field for new users
+                        <div className="form-group">
+                            <label htmlFor="password">Senha Inicial</label>
+                            <div className="input-group">
                                 <input
                                     type={isPasswordVisible ? 'text' : 'password'}
-                                    id="modal-user-password"
-                                    name="password"
                                     className="form-control"
+                                    id="password"
+                                    name="password"
                                     value={formData.password}
                                     onChange={handleFormInputChange}
-                                    required={!currentUser} /* Required only when adding */
+                                    required={!currentUser} // Required only for new users
+                                    minLength="6"
                                 />
-                                <button type="button" className="password-toggle" onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
-                                    <FontAwesomeIcon icon={isPasswordVisible ? faEyeSlash : faEye} />
-                                </button>
+                                <div className="input-group-append">
+                                    <button
+                                        className="btn btn-outline-secondary"
+                                        type="button"
+                                        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                                    >
+                                        <FontAwesomeIcon icon={isPasswordVisible ? faEyeSlash : faEye} />
+                                    </button>
+                                </div>
                             </div>
+                            <small className="form-text text-muted">Mínimo de 6 caracteres.</small>
                         </div>
                     )}
                 </form>
@@ -581,20 +674,18 @@ function Users() {
                 isOpen={isConfirmOpen}
                 onClose={closeConfirmModal}
                 title="Confirmar Exclusão"
-                size="sm" // Use small size for confirmation
                 footer={
                     <>
-                        <button className="btn btn-outline-secondary" onClick={closeConfirmModal}>Cancelar</button>
+                        <button className="btn btn-secondary" onClick={closeConfirmModal} disabled={loading}>Cancelar</button>
                         <button className="btn btn-danger" onClick={handleDeleteUser} disabled={loading}>
                             {loading ? 'Excluindo...' : 'Excluir'}
                         </button>
                     </>
                 }
             >
-                <p>Tem certeza que deseja excluir o usuário "{userToDelete?.name}"? Esta ação não pode ser desfeita.</p>
-                <p><small>(Nota: A conta de autenticação associada não será excluída.)</small></p>
+                <p>Tem certeza que deseja excluir o usuário <strong>{userToDelete?.name}</strong>?</p>
+                <small className="form-text text-danger">Esta ação removerá o registro do usuário do banco de dados, mas não da autenticação do Firebase. A exclusão completa requer passos adicionais.</small>
             </Modal>
-
         </Layout>
     );
 }
