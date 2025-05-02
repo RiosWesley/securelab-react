@@ -4,8 +4,10 @@ import Layout from '../components/Layout';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDoorOpen, faPlus, faSyncAlt, faEllipsisV, faFileCsv, faFilePdf, faEdit, faTrashAlt, faLock, faLockOpen, faSlidersH, faSearch } from '@fortawesome/free-solid-svg-icons';
-import { ref, onValue, get, push, update, remove, query, orderByChild } from 'firebase/database';
+// Adicionado faUsers
+import { faDoorOpen, faPlus, faSyncAlt, faEllipsisV, faFileCsv, faFilePdf, faEdit, faTrashAlt, faLock, faLockOpen, faSlidersH, faSearch, faUsers } from '@fortawesome/free-solid-svg-icons';
+// Importado get para buscar dados pontualmente
+import { ref, onValue, get, push, set, update, remove, query, orderByChild } from 'firebase/database';
 import { database, auth } from '../firebase/firebaseConfig'; // Import auth if needed for logging
 import { showNotification } from '../utils/notifications';
 import { formatDateTime, getStatusClass, formatStatus } from '../utils/formatters';
@@ -24,6 +26,14 @@ function Doors() {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [currentDoor, setCurrentDoor] = useState(null); // For add/edit/control/delete
     const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+
+    // Novos estados para o modal de usuários autorizados
+    const [isAuthorizedUsersModalOpen, setIsAuthorizedUsersModalOpen] = useState(false);
+    const [currentDoorForAuthUsers, setCurrentDoorForAuthUsers] = useState(null);
+    // Novo estado para armazenar a lista de usuários autorizados para a porta selecionada
+    const [authorizedUsersList, setAuthorizedUsersList] = useState([]);
+    const [loadingAuthUsers, setLoadingAuthUsers] = useState(false);
+
 
     // Form state for Add/Edit Modal
     const [formData, setFormData] = useState({ name: '', location: '', status: 'locked' });
@@ -104,9 +114,62 @@ function Doors() {
         setIsConfirmOpen(true);
     };
 
+    // Nova função para abrir o modal de usuários autorizados e buscar dados
+    const openAuthorizedUsersModal = async (door) => {
+        if (!door.device) {
+            showNotification(`A porta "${door.name}" não possui um dispositivo associado.`, 'warning');
+            return;
+        }
+
+        setCurrentDoorForAuthUsers(door);
+        setIsAuthorizedUsersModalOpen(true);
+        setLoadingAuthUsers(true);
+        setAuthorizedUsersList([]); // Clear previous list
+
+        const deviceId = door.device; // Assumindo que o campo 'device' existe na porta
+        const authTagsRef = ref(database, `devices/${deviceId}/authorized_tags`);
+        const usersRef = ref(database, 'users');
+
+        try {
+            // Buscar authorized_tags para o dispositivo
+            const authTagsSnapshot = await get(authTagsRef);
+            const authTagsData = authTagsSnapshot.val() || {}; // Use empty object if no tags
+
+            // Buscar todos os usuários
+            const usersSnapshot = await get(usersRef);
+            const usersData = usersSnapshot.val() || {};
+
+            const usersArray = Object.entries(usersData).map(([id, user]) => ({ id, ...user }));
+
+            // Combinar dados: verificar status de autorização para cada usuário
+            const combinedUsers = usersArray.map(user => ({
+                ...user,
+                // Verificar se o valor é o booleano true
+                isAuthorized: authTagsData[user.id] === true
+            }));
+
+            setAuthorizedUsersList(combinedUsers);
+
+        } catch (error) {
+            console.error('Erro ao carregar usuários autorizados:', error);
+            showNotification('Erro ao carregar usuários autorizados: ' + error.message, 'error');
+            setAuthorizedUsersList([]); // Clear list on error
+        } finally {
+            setLoadingAuthUsers(false);
+        }
+    };
+
+
     const closeAddEditModal = () => setIsAddEditModalOpen(false);
     const closeControlModal = () => setIsControlModalOpen(false);
     const closeConfirmModal = () => setIsConfirmOpen(false);
+    // Nova função para fechar o modal de usuários autorizados
+    const closeAuthorizedUsersModal = () => {
+        setIsAuthorizedUsersModalOpen(false);
+        setCurrentDoorForAuthUsers(null); // Clear selected door
+        setAuthorizedUsersList([]); // Clear list when closing modal
+    };
+
 
     const handleFormInputChange = (event) => {
         const { name, value } = event.target;
@@ -219,6 +282,40 @@ function Doors() {
         setIsExportMenuOpen(false); // Close menu
     };
 
+    // Nova função para alternar a autorização do usuário para a porta
+    const handleToggleAuthorization = async (userId, isAuthorized) => {
+        if (!currentDoorForAuthUsers || !currentDoorForAuthUsers.device) {
+            showNotification('Erro: Porta ou dispositivo não selecionado.', 'error');
+            return;
+        }
+
+        setLoadingAuthUsers(true); // Indicate saving
+
+        const deviceId = currentDoorForAuthUsers.device;
+        const authTagPath = `devices/${deviceId}/authorized_tags/${userId}`;
+
+        try {
+            if (isAuthorized) {
+                // Se o usuário está autorizado (true), defina o valor como false para desautorizar
+                await set(ref(database, authTagPath), false); // Salva como booleano false
+                showNotification('Usuário desautorizado com sucesso!', 'success');
+            } else {
+                // Se o usuário não está autorizado (false ou não existe), defina o valor como o booleano true para autorizar
+                await set(ref(database, authTagPath), true); // Salva como booleano true
+                showNotification('Usuário autorizado com sucesso!', 'success');
+            }
+
+            // Re-buscar a lista completa após a alteração para atualizar o modal
+            openAuthorizedUsersModal(currentDoorForAuthUsers);
+
+        } catch (error) {
+            console.error('Erro ao alternar autorização:', error);
+            showNotification('Erro ao alternar autorização: ' + error.message, 'error');
+        } finally {
+            // setLoadingAuthUsers(false); // Loading will be handled by re-fetch in openAuthorizedUsersModal
+        }
+    };
+
 
     // --- Pagination Calculation ---
     const totalPages = Math.ceil(filteredDoors.length / PAGE_SIZE);
@@ -283,7 +380,7 @@ function Doors() {
                                 <th>Nome</th>
                                 <th className="col-location">Localização</th>
                                 <th>Status</th>
-                                <th className="col-last-activity">Última Atividade</th>
+                                <th>Última Atividade</th>
                                 <th>Ações</th>
                             </tr>
                             </thead>
@@ -304,6 +401,10 @@ function Doors() {
                                         <td className="col-last-activity">{formatDateTime(door.last_status_change)}</td>
                                         <td>
                                             <div className="action-buttons">
+                                                {/* Novo botão para gerenciar usuários autorizados */}
+                                                <button className="action-btn action-btn-info" onClick={() => openAuthorizedUsersModal(door)} title="Gerenciar Usuários Autorizados">
+                                                    <FontAwesomeIcon icon={faUsers} />
+                                                </button>
                                                 <button className="action-btn action-btn-edit" onClick={() => openEditDoorModal(door)} title="Editar">
                                                     <FontAwesomeIcon icon={faEdit} />
                                                 </button>
@@ -346,6 +447,10 @@ function Doors() {
                                             <strong>Última Atividade:</strong> {formatDateTime(door.last_status_change)}
                                         </p>
                                         <div className="action-buttons">
+                                            {/* Novo botão para gerenciar usuários autorizados (Mobile) */}
+                                            <button className="action-btn action-btn-info" onClick={() => openAuthorizedUsersModal(door)} title="Gerenciar Usuários Autorizados">
+                                                <FontAwesomeIcon icon={faUsers} />
+                                            </button>
                                             <button className="action-btn action-btn-edit" onClick={() => openEditDoorModal(door)} title="Editar">
                                                 <FontAwesomeIcon icon={faEdit} />
                                             </button>
@@ -464,6 +569,57 @@ function Doors() {
                 }
             >
                 <p>Tem certeza que deseja excluir a porta "{currentDoor?.name}"?</p>
+            </Modal>
+
+            {/* Authorized Users Modal */}
+            <Modal
+                isOpen={isAuthorizedUsersModalOpen}
+                onClose={closeAuthorizedUsersModal}
+                title={`Usuários Autorizados - ${currentDoorForAuthUsers?.name || ''}`}
+                size="xl" // Alterado para 'xl'
+                footer={
+                    <button className="btn btn-secondary" onClick={closeAuthorizedUsersModal}>Fechar</button>
+                }
+            >
+                {loadingAuthUsers ? (
+                    <p className="text-center">Carregando usuários autorizados...</p>
+                ) : authorizedUsersList.length > 0 ? (
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Função</th>
+                                <th>Status</th>
+                                <th>Autorizado</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {authorizedUsersList.map(user => (
+                                <tr key={user.id}>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.role}</td> {/* TODO: Use translateRole if available */}
+                                    <td>{user.status}</td> {/* TODO: Use formatStatus and getStatusClass */}
+                                    <td>{user.isAuthorized ? 'Sim' : 'Não'}</td>
+                                    <td>
+                                        {/* Botão para alternar autorização */}
+                                        <button
+                                            className={`btn btn-sm ${user.isAuthorized ? 'btn-outline-danger' : 'btn-outline-success'}`}
+                                            onClick={() => handleToggleAuthorization(user.id, user.isAuthorized)}
+                                            disabled={loadingAuthUsers}
+                                        >
+                                            {user.isAuthorized ? 'Desautorizar' : 'Autorizar'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p className="text-center">Nenhum usuário encontrado ou autorizado para esta porta.</p>
+                )}
             </Modal>
 
         </Layout>

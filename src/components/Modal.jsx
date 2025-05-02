@@ -42,6 +42,9 @@ function Modal({ isOpen, onClose, title, children, footer, size = 'md' }) { // A
     let sizeClass = '';
     if (size === 'sm') sizeClass = 'modal-sm';
     if (size === 'lg') sizeClass = 'modal-lg';
+    // Adicionado suporte para tamanho 'xl'
+    if (size === 'xl') sizeClass = 'modal-xl';
+
 
     // Stop propagation on dialog click to prevent closing when clicking inside
     const handleDialogClick = (e) => {

@@ -1,6 +1,6 @@
 /* components.css - Optimized */
 
-/* ===== BOTÃ•ES ===== */
+/* ===== BOTÕES ===== */
 .btn {
   display: inline-block;
   font-weight: 500;
@@ -141,6 +141,14 @@
 .modal-sm{
   max-width: 300px;
 }
+.modal-lg{
+  max-width: 800px; /* Bootstrap default for lg */
+}
+/* Nova classe para modal extra grande */
+.modal-xl{
+  max-width: 1200px; /* Definir um max-width maior */
+}
+
 
 .modal-content {
   background-color: #fff;
@@ -498,7 +506,4 @@
 /* Sidebar Navigation Icon Spacing */
 .sidebar-nav .nav-icon {
   margin-right: 8px; /* Adjust this value if you want more/less space */
-  width: 1.1em; /* Helps align icons if they have different natural widths */
-  text-align: center; /* Centers the icon within the allocated width */
-  vertical-align: middle; /* Improves vertical alignment with text */
 }
