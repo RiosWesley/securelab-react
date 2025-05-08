@@ -575,10 +575,7 @@ function Users() {
                             name="email"
                             value={formData.email}
                             onChange={handleFormInputChange}
-                            required
-                            disabled={!!currentUser} // Disable email edit for existing users (due to Auth complexity)
                         />
-                         {currentUser && <small className="form-text text-muted">O email não pode ser alterado após a criação do usuário.</small>}
                     </div>
                     <div className="form-group">
                         <label htmlFor="department">Departamento</label>
