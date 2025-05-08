@@ -10,10 +10,11 @@ import { faDoorOpen, faPlus, faSyncAlt, faEllipsisV, faFileCsv, faFilePdf, faEdi
 import { ref, onValue, get, push, set, update, remove, query, orderByChild } from 'firebase/database';
 import { database, auth } from '../firebase/firebaseConfig'; // Import auth if needed for logging
 import { showNotification } from '../utils/notifications';
-import { formatDateTime, getStatusClass, formatStatus } from '../utils/formatters';
+import { formatDateTime, getStatusClass, formatStatus, translateRole } from '../utils/formatters';
 import { debounce } from '../utils/helpers';
 
 const PAGE_SIZE = 10;
+const MODAL_PAGE_SIZE = 10; // Page size for the authorized users modal
 
 function Doors() {
     const [doors, setDoors] = useState([]);
@@ -33,6 +34,8 @@ function Doors() {
     // Novo estado para armazenar a lista de usuários autorizados para a porta selecionada
     const [authorizedUsersList, setAuthorizedUsersList] = useState([]);
     const [loadingAuthUsers, setLoadingAuthUsers] = useState(false);
+    const [modalSearchTerm, setModalSearchTerm] = useState('');
+    const [modalCurrentPage, setModalCurrentPage] = useState(1);
 
 
     // Form state for Add/Edit Modal
@@ -125,6 +128,8 @@ function Doors() {
         setIsAuthorizedUsersModalOpen(true);
         setLoadingAuthUsers(true);
         setAuthorizedUsersList([]); // Clear previous list
+        setModalSearchTerm(''); // Reset search term for modal
+        setModalCurrentPage(1); // Reset page for modal
 
         const deviceId = door.device; // Assumindo que o campo 'device' existe na porta
         const authTagsRef = ref(database, `devices/${deviceId}/authorized_tags`);
@@ -168,6 +173,8 @@ function Doors() {
         setIsAuthorizedUsersModalOpen(false);
         setCurrentDoorForAuthUsers(null); // Clear selected door
         setAuthorizedUsersList([]); // Clear list when closing modal
+        setModalSearchTerm(''); // Clear search term
+        setModalCurrentPage(1); // Reset page
     };
 
 
@@ -322,6 +329,32 @@ function Doors() {
     const startIndex = (currentPage - 1) * PAGE_SIZE;
     const endIndex = Math.min(startIndex + PAGE_SIZE, filteredDoors.length);
     const currentDoorsPage = filteredDoors.slice(startIndex, endIndex);
+
+    // --- Modal Search and Pagination Logic ---
+    const handleModalSearchChange = (event) => {
+        setModalSearchTerm(event.target.value);
+        setModalCurrentPage(1); // Reset to first page on search
+    };
+
+    const handleModalPageChange = (page) => {
+        setModalCurrentPage(page);
+    };
+
+    const filteredModalUsers = authorizedUsersList.filter(user => {
+        if (!modalSearchTerm) return true;
+        const lowerSearch = modalSearchTerm.toLowerCase();
+        return (
+            (user.name?.toLowerCase() || '').includes(lowerSearch) ||
+            (user.email?.toLowerCase() || '').includes(lowerSearch) ||
+            (translateRole(user.role)?.toLowerCase() || '').includes(lowerSearch)
+        );
+    });
+
+    const modalTotalPages = Math.ceil(filteredModalUsers.length / MODAL_PAGE_SIZE);
+    const modalStartIndex = (modalCurrentPage - 1) * MODAL_PAGE_SIZE;
+    const modalEndIndex = Math.min(modalStartIndex + MODAL_PAGE_SIZE, filteredModalUsers.length);
+    const currentModalUsersPage = filteredModalUsers.slice(modalStartIndex, modalEndIndex);
+
 
     return (
         <Layout>
@@ -581,44 +614,72 @@ function Doors() {
                     <button className="btn btn-secondary" onClick={closeAuthorizedUsersModal}>Fechar</button>
                 }
             >
+                <div className="mb-3">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Buscar por nome, email ou função..."
+                        value={modalSearchTerm}
+                        onChange={handleModalSearchChange}
+                    />
+                </div>
                 {loadingAuthUsers ? (
-                    <p className="text-center">Carregando usuários autorizados...</p>
-                ) : authorizedUsersList.length > 0 ? (
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Função</th>
-                                <th>Status</th>
-                                <th>Autorizado</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {authorizedUsersList.map(user => (
-                                <tr key={user.id}>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.role}</td> {/* TODO: Use translateRole if available */}
-                                    <td>{user.status}</td> {/* TODO: Use formatStatus and getStatusClass */}
-                                    <td>{user.isAuthorized ? 'Sim' : 'Não'}</td>
-                                    <td>
-                                        {/* Botão para alternar autorização */}
-                                        <button
-                                            className={`btn btn-sm ${user.isAuthorized ? 'btn-outline-danger' : 'btn-outline-success'}`}
-                                            onClick={() => handleToggleAuthorization(user.id, user.isAuthorized)}
-                                            disabled={loadingAuthUsers}
-                                        >
-                                            {user.isAuthorized ? 'Desautorizar' : 'Autorizar'}
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <p className="text-center">Carregando usuários...</p>
+                ) : currentModalUsersPage.length > 0 ? (
+                    <>
+                        <div className="table-responsive">
+                            <table className="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Função</th>
+                                        <th>Status</th>
+                                        <th className="text-center">Autorizado</th>
+                                        <th className="text-center">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentModalUsersPage.map(user => (
+                                        <tr key={user.id}>
+                                            <td>{user.name}</td>
+                                            <td>{user.email}</td>
+                                            <td>{translateRole(user.role)}</td>
+                                            <td>
+                                                <span className={`badge-status badge-${getStatusClass(user.status)}`}>
+                                                    {formatStatus(user.status)}
+                                                </span>
+                                            </td>
+                                            <td className="text-center">{user.isAuthorized ? 'Sim' : 'Não'}</td>
+                                            <td className="text-center">
+                                                <button
+                                                    className={`btn btn-sm ${user.isAuthorized ? 'btn-danger' : 'btn-success'}`}
+                                                    onClick={() => handleToggleAuthorization(user.id, user.isAuthorized)}
+                                                    disabled={loadingAuthUsers} // Consider a more specific loading state if needed
+                                                    title={user.isAuthorized ? 'Desautorizar Usuário' : 'Autorizar Usuário'}
+                                                >
+                                                    {user.isAuthorized ? 'Desautorizar' : 'Autorizar'}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {filteredModalUsers.length > MODAL_PAGE_SIZE && (
+                            <Pagination
+                                currentPage={modalCurrentPage}
+                                totalPages={modalTotalPages}
+                                onPageChange={handleModalPageChange}
+                                totalItems={filteredModalUsers.length}
+                                itemsPerPage={MODAL_PAGE_SIZE}
+                            />
+                        )}
+                    </>
                 ) : (
-                    <p className="text-center">Nenhum usuário encontrado ou autorizado para esta porta.</p>
+                    <p className="text-center">
+                        {modalSearchTerm ? 'Nenhum usuário encontrado com o termo buscado.' : 'Nenhum usuário cadastrado ou nenhum associado a esta porta ainda.'}
+                    </p>
                 )}
             </Modal>
 
