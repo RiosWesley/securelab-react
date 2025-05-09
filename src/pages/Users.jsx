@@ -4,8 +4,8 @@ import Layout from '../components/Layout';
 import Modal from '../components/Modal'; // Import the reusable Modal
 import Pagination from '../components/Pagination'; // Create this component later
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faPlus, faSyncAlt, faEllipsisV, faFileCsv, faFilePdf, faEdit, faTrashAlt, faEye, faEyeSlash, faSearch } from '@fortawesome/free-solid-svg-icons';
-import { ref, onValue, get, push, update, remove, query, orderByChild, equalTo } from 'firebase/database';
+import { faUsers, faPlus, faSyncAlt, faEllipsisV, faFileCsv, faFilePdf, faEdit, faTrashAlt, faEye, faEyeSlash, faSearch, faDoorOpen } from '@fortawesome/free-solid-svg-icons';
+import { ref, onValue, get, push, update, remove, query, orderByChild, equalTo, set } from 'firebase/database';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'; // Import auth functions
 import { database, auth } from '../firebase/firebaseConfig';
 import { showNotification } from '../utils/notifications';
@@ -14,6 +14,7 @@ import { debounce } from '../utils/helpers'; // Create this helper file later
 
 // Constants
 const PAGE_SIZE = 10;
+const MODAL_DOORS_PAGE_SIZE = 10; // Page size for the authorized doors modal
 
 function Users() {
     const [users, setUsers] = useState([]); // All users from DB
@@ -33,6 +34,15 @@ function Users() {
     const [formData, setFormData] = useState({
         name: '', email: '', department: '', role: '', status: 'active', password: '', rfidTagId: '' // Added rfidTagId
     });
+
+    // States for Authorized Doors Modal
+    const [isAuthorizedDoorsModalOpen, setIsAuthorizedDoorsModalOpen] = useState(false);
+    const [currentUserForDoors, setCurrentUserForDoors] = useState(null); // User whose doors are being managed
+    const [allDoorsListForModal, setAllDoorsListForModal] = useState([]); // Stores { ...door, isAuthorized: boolean }
+    const [loadingModalDoors, setLoadingModalDoors] = useState(false);
+    const [modalDoorsSearchTerm, setModalDoorsSearchTerm] = useState('');
+    const [modalDoorsCurrentPage, setModalDoorsCurrentPage] = useState(1);
+    const [allDevicesData, setAllDevicesData] = useState({}); // To store all devices data once
 
     // --- Data Fetching and Filtering ---
 
@@ -341,6 +351,125 @@ function Users() {
     const endIndex = Math.min(startIndex + PAGE_SIZE, filteredUsers.length);
     const currentUsersPage = filteredUsers.slice(startIndex, endIndex);
 
+    // --- Authorized Doors Modal Logic ---
+
+    const fetchDataForAuthorizedDoorsModal = async (user) => {
+        if (!user) return;
+        setLoadingModalDoors(true);
+        try {
+            const doorsRef = ref(database, 'doors');
+            const devicesRef = ref(database, 'devices');
+
+            const [doorsSnapshot, devicesSnapshot] = await Promise.all([
+                get(doorsRef),
+                get(devicesRef)
+            ]);
+
+            const doorsData = doorsSnapshot.val() || {};
+            const localDevicesData = devicesSnapshot.val() || {}; // Use local var to avoid stale state issues in map
+            setAllDevicesData(localDevicesData); // Store for potential future use if needed outside this immediate scope
+
+            const doorsArray = Object.entries(doorsData).map(([id, door]) => ({ id, ...door }));
+
+            const processedDoorsList = doorsArray.map(door => {
+                let isAuthorized = false;
+                // Ensure user.id is valid before using it in the path
+                if (user && user.id && door.device && localDevicesData[door.device] && localDevicesData[door.device].authorized_tags) {
+                    isAuthorized = localDevicesData[door.device].authorized_tags[user.id] === true;
+                }
+                return { ...door, isAuthorized };
+            });
+            
+            processedDoorsList.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            setAllDoorsListForModal(processedDoorsList);
+
+        } catch (error) {
+            console.error("Erro ao carregar dados para o modal de portas autorizadas:", error);
+            showNotification("Erro ao carregar dados das portas: " + error.message, 'error');
+            setAllDoorsListForModal([]);
+        } finally {
+            setLoadingModalDoors(false);
+        }
+    };
+
+    const openAuthorizedDoorsModal = (user) => {
+        setCurrentUserForDoors(user);
+        setIsAuthorizedDoorsModalOpen(true);
+        setModalDoorsSearchTerm('');
+        setModalDoorsCurrentPage(1);
+        fetchDataForAuthorizedDoorsModal(user); 
+    };
+
+    const closeAuthorizedDoorsModal = () => {
+        setIsAuthorizedDoorsModalOpen(false);
+        setCurrentUserForDoors(null);
+        setAllDoorsListForModal([]);
+        setAllDevicesData({}); // Clear stored devices data
+        setModalDoorsSearchTerm('');
+        setModalDoorsCurrentPage(1); 
+    };
+
+    const handleToggleDoorAuthorization = async (door, isCurrentlyAuthorized) => {
+        if (!currentUserForDoors || !currentUserForDoors.id || !door.id) { // Added check for currentUserForDoors.id
+            showNotification("Usuário ou porta inválida.", 'error');
+            return;
+        }
+        if (!door.device) {
+            showNotification(`A porta "${door.name}" não está associada a nenhum dispositivo. Não é possível alterar a autorização.`, 'warning');
+            return;
+        }
+
+        setLoadingModalDoors(true); 
+
+        const userId = currentUserForDoors.id;
+        const deviceId = door.device;
+        const authPath = `devices/${deviceId}/authorized_tags/${userId}`;
+
+        try {
+            if (isCurrentlyAuthorized) {
+                await set(ref(database, authPath), false); // Explicitly set to false
+                showNotification(`Acesso do usuário ${currentUserForDoors.name} à porta ${door.name} removido.`, 'success');
+            } else {
+                await set(ref(database, authPath), true);
+                showNotification(`Usuário ${currentUserForDoors.name} autorizado para a porta ${door.name}.`, 'success');
+            }
+            // Refresh data in the modal by updating the specific door's authorization status locally
+            setAllDoorsListForModal(prevList => 
+                prevList.map(d => d.id === door.id ? { ...d, isAuthorized: !isCurrentlyAuthorized } : d)
+            );
+
+        } catch (error) {
+            console.error("Erro ao alternar autorização da porta:", error);
+            showNotification("Erro ao atualizar autorização: " + error.message, 'error');
+        } finally {
+            setLoadingModalDoors(false);
+        }
+    };
+
+    // Search and Pagination for Authorized Doors Modal
+    const handleModalDoorsSearchChange = (event) => {
+        setModalDoorsSearchTerm(event.target.value);
+        setModalDoorsCurrentPage(1);
+    };
+
+    const handleModalDoorsPageChange = (page) => {
+        setModalDoorsCurrentPage(page);
+    };
+
+    const filteredModalDoors = allDoorsListForModal.filter(door => {
+        if (!modalDoorsSearchTerm) return true;
+        const lowerSearch = modalDoorsSearchTerm.toLowerCase();
+        return (
+            (door.name?.toLowerCase() || '').includes(lowerSearch) ||
+            (door.location?.toLowerCase() || '').includes(lowerSearch)
+        );
+    });
+
+    const modalDoorsTotalPages = Math.ceil(filteredModalDoors.length / MODAL_DOORS_PAGE_SIZE);
+    const modalDoorsStartIndex = (modalDoorsCurrentPage - 1) * MODAL_DOORS_PAGE_SIZE;
+    const modalDoorsEndIndex = Math.min(modalDoorsStartIndex + MODAL_DOORS_PAGE_SIZE, filteredModalDoors.length);
+    const currentModalDoorsPageItems = filteredModalDoors.slice(modalDoorsStartIndex, modalDoorsEndIndex);
+
     return (
         <Layout>
             <div className="page-header">
@@ -463,6 +592,9 @@ function Users() {
                                         <td>{user.rfidTagId || '-'}</td> {/* Display rfidTagId */}
                                         <td>
                                             <div className="action-buttons">
+                                                <button className="action-btn action-btn-info" onClick={() => openAuthorizedDoorsModal(user)} title="Gerenciar Acesso às Portas">
+                                                    <FontAwesomeIcon icon={faDoorOpen} />
+                                                </button>
                                                 <button className="action-btn action-btn-edit" onClick={() => openEditUserModal(user)} title="Editar">
                                                     <FontAwesomeIcon icon={faEdit} />
                                                 </button>
@@ -511,6 +643,9 @@ function Users() {
                                             <strong>Criado em:</strong> {formatDate(user.created_at)}
                                         </p>
                                         <div className="action-buttons justify-content-end"> {/* Align buttons right */}
+                                            <button className="action-btn action-btn-info" onClick={() => openAuthorizedDoorsModal(user)} title="Gerenciar Acesso às Portas">
+                                                <FontAwesomeIcon icon={faDoorOpen} />
+                                            </button>
                                             <button className="action-btn action-btn-edit" onClick={() => openEditUserModal(user)} title="Editar">
                                                 <FontAwesomeIcon icon={faEdit} />
                                             </button>
@@ -682,6 +817,94 @@ function Users() {
             >
                 <p>Tem certeza que deseja excluir o usuário <strong>{userToDelete?.name}</strong>?</p>
                 <small className="form-text text-danger">Esta ação removerá o registro do usuário do banco de dados, mas não da autenticação do Firebase. A exclusão completa requer passos adicionais.</small>
+            </Modal>
+
+            {/* Authorized Doors Modal */}
+            <Modal
+                isOpen={isAuthorizedDoorsModalOpen}
+                onClose={closeAuthorizedDoorsModal}
+                title={`Gerenciar Acesso às Portas - ${currentUserForDoors?.name || ''}`}
+                size="xl"
+                footer={
+                    <button className="btn btn-secondary" onClick={closeAuthorizedDoorsModal}>Fechar</button>
+                }
+            >
+                <div className="mb-3">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Buscar por nome ou localização da porta..."
+                        value={modalDoorsSearchTerm}
+                        onChange={handleModalDoorsSearchChange}
+                    />
+                </div>
+                {loadingModalDoors ? (
+                    <p className="text-center">Carregando portas...</p>
+                ) : currentModalDoorsPageItems.length > 0 ? (
+                    <>
+                        <div className="table-responsive">
+                            <table className="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nome da Porta</th>
+                                        <th>Localização</th>
+                                        <th className="text-center">Autorizado</th>
+                                        <th className="text-center">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentModalDoorsPageItems.map(door => (
+                                        <tr key={door.id}>
+                                            <td>{door.name || 'Sem nome'}</td>
+                                            <td>{door.location || '-'}</td>
+                                            <td className="text-center">
+                                                {door.device ? (
+                                                    <span className={`badge ${door.isAuthorized ? 'bg-success' : 'bg-danger'}`}>
+                                                        {door.isAuthorized ? 'Sim' : 'Não'}
+                                                    </span>
+                                                ) : (
+                                                    <span className="badge bg-secondary">N/A</span>
+                                                )}
+                                            </td>
+                                            <td className="text-center">
+                                                {door.device ? (
+                                                    <button
+                                                        className={`btn btn-sm ${door.isAuthorized ? 'btn-danger' : 'btn-success'}`}
+                                                        onClick={() => handleToggleDoorAuthorization(door, door.isAuthorized)}
+                                                        disabled={loadingModalDoors} // Or a more specific loading state for the row/button
+                                                        title={door.isAuthorized ? 'Remover Acesso' : 'Conceder Acesso'}
+                                                    >
+                                                        {door.isAuthorized ? 'Desautorizar' : 'Autorizar'}
+                                                    </button>
+                                                ) : (
+                                                    <small className="text-muted">Sem dispositivo</small>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {filteredModalDoors.length > MODAL_DOORS_PAGE_SIZE && (
+                            <Pagination
+                                currentPage={modalDoorsCurrentPage}
+                                totalPages={modalDoorsTotalPages}
+                                onPageChange={handleModalDoorsPageChange}
+                                totalItems={filteredModalDoors.length}
+                                itemsPerPage={MODAL_DOORS_PAGE_SIZE}
+                            />
+                        )}
+                    </>
+                ) : (
+                    <p className="text-center">
+                        {modalDoorsSearchTerm 
+                            ? 'Nenhuma porta encontrada com o termo buscado.'
+                            : (allDoorsListForModal.length === 0 && !loadingModalDoors) 
+                                ? 'Nenhuma porta cadastrada no sistema.'
+                                : 'Nenhuma porta corresponde aos critérios ou este usuário não tem acesso configurável no momento.'
+                        }
+                    </p>
+                )}
             </Modal>
         </Layout>
     );
