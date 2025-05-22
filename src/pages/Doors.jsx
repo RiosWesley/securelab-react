@@ -43,30 +43,42 @@ function Doors() {
 
     const loadDoors = useCallback(() => {
         setLoading(true);
-        const doorsRef = ref(database, 'doors');
-        onValue(doorsRef, (snapshot) => {
-            const doorsData = snapshot.val();
+        const devicesRef = ref(database, 'devices');
+        onValue(devicesRef, (snapshot) => {
+            const devicesData = snapshot.val();
             let doorsArray = [];
-            if (doorsData) {
-                doorsArray = Object.entries(doorsData).map(([id, door]) => ({ id, ...door }));
+            if (devicesData) {
+                // Mapear devices como portas, filtrando apenas devices que são leitores RFID
+                doorsArray = Object.entries(devicesData)
+                    .filter(([id, device]) => device.typeCode === 'rfid-reader' || !device.typeCode) // Incluir todos se não tiver typeCode definido
+                    .map(([id, device]) => ({
+                        id,
+                        name: device.name || 'Dispositivo sem nome',
+                        location: device.location || 'Localização não definida',
+                        status: device.status || 'locked',
+                        last_status_change: device.last_status_change,
+                        device: id, // O próprio ID do device
+                        // Campos adicionais específicos de devices
+                        firmware: device.firmware,
+                        last_online: device.last_online,
+                        temperature: device.temperature,
+                        cpu_usage: device.cpu_usage,
+                        ram_usage: device.ram_usage
+                    }));
             }
             setDoors(doorsArray);
             setLoading(false);
         }, (error) => {
-            console.error('Erro ao carregar portas:', error);
-            showNotification('Erro ao carregar portas: ' + error.message, 'error');
+            console.error('Erro ao carregar dispositivos:', error);
+            showNotification('Erro ao carregar dispositivos: ' + error.message, 'error');
             setLoading(false);
         });
-        // Use get for a single fetch:
-        /*
-        get(doorsRef).then(snapshot => { ... }).catch(error => { ... }).finally(() => setLoading(false));
-        */
     }, []);
 
     useEffect(() => {
         loadDoors();
         // Cleanup for onValue listener:
-        // return () => ref(database, 'doors').off();
+        // return () => ref(database, 'devices').off();
     }, [loadDoors]);
 
     // Filtering and Searching Effect
@@ -120,7 +132,7 @@ function Doors() {
     // Nova função para abrir o modal de usuários autorizados e buscar dados
     const openAuthorizedUsersModal = async (door) => {
         if (!door.device) {
-            showNotification(`A porta "${door.name}" não possui um dispositivo associado.`, 'warning');
+            showNotification(`O dispositivo "${door.name}" não possui um ID associado.`, 'warning');
             return;
         }
 
@@ -131,7 +143,7 @@ function Doors() {
         setModalSearchTerm(''); // Reset search term for modal
         setModalCurrentPage(1); // Reset page for modal
 
-        const deviceId = door.device; // Assumindo que o campo 'device' existe na porta
+        const deviceId = door.device; // O próprio ID do device
         const authTagsRef = ref(database, `devices/${deviceId}/authorized_tags`);
         const usersRef = ref(database, 'users');
 
@@ -184,32 +196,38 @@ function Doors() {
     };
 
     const handleSaveDoor = async () => {
-        if (!formData.name.trim()) return showNotification('O nome da porta é obrigatório', 'error');
+        if (!formData.name.trim()) return showNotification('O nome do dispositivo é obrigatório', 'error');
         if (!formData.location.trim()) return showNotification('A localização é obrigatória', 'error');
 
-        const doorData = {
+        const deviceData = {
             name: formData.name.trim(),
             location: formData.location.trim(),
             // Only set initial status when adding, retain current status on edit
             ...( !currentDoor && { status: formData.status }),
-            ...( !currentDoor && { last_status_change: new Date().toISOString()}) // Set timestamp only for new
+            ...( !currentDoor && { last_status_change: new Date().toISOString()}), // Set timestamp only for new
+            // Adicionar campos padrão para novos devices
+            ...( !currentDoor && { 
+                typeCode: 'rfid-reader',
+                firmware: 'v1.0.0',
+                authorized_tags: {}
+            })
         };
 
         setLoading(true); // Indicate saving
 
         try {
-            if (currentDoor) { // Edit existing door
-                await update(ref(database, `doors/${currentDoor.id}`), doorData);
-                showNotification('Porta atualizada com sucesso!', 'success');
-            } else { // Add new door
-                await push(ref(database, 'doors'), doorData);
-                showNotification('Porta adicionada com sucesso!', 'success');
+            if (currentDoor) { // Edit existing device
+                await update(ref(database, `devices/${currentDoor.id}`), deviceData);
+                showNotification('Dispositivo atualizado com sucesso!', 'success');
+            } else { // Add new device
+                await push(ref(database, 'devices'), deviceData);
+                showNotification('Dispositivo adicionado com sucesso!', 'success');
             }
             closeAddEditModal();
             // loadDoors(); // Listener will update automatically if using onValue
         } catch (error) {
-            console.error('Erro ao salvar porta:', error);
-            showNotification('Erro ao salvar porta: ' + error.message, 'error');
+            console.error('Erro ao salvar dispositivo:', error);
+            showNotification('Erro ao salvar dispositivo: ' + error.message, 'error');
         } finally {
             setLoading(false);
         }
@@ -224,7 +242,7 @@ function Doors() {
             return;
         }
 
-        const doorRef = ref(database, `doors/${currentDoor.id}`);
+        const deviceRef = ref(database, `devices/${currentDoor.id}`);
         const user = auth.currentUser; // For logging
         let userName = user?.displayName || user?.email || 'Sistema';
 
@@ -234,7 +252,7 @@ function Doors() {
         setLoading(true); // Indicate processing
 
         try {
-            await update(doorRef, {
+            await update(deviceRef, {
                 status: newStatus,
                 last_status_change: new Date().toISOString()
             });
@@ -245,7 +263,7 @@ function Doors() {
                     user_id: user.uid,
                     user_name: userName,
                     door_id: currentDoor.id,
-                    door_name: currentDoor.name || 'Porta',
+                    door_name: currentDoor.name || 'Dispositivo',
                     action: newStatus === 'locked' ? 'door_locked' : 'access_granted', // Or 'door_unlocked' if preferred
                     method: 'web',
                     timestamp: new Date().toISOString()
@@ -253,13 +271,13 @@ function Doors() {
                 await push(ref(database, 'access_logs'), logData);
             }
 
-            showNotification(`Porta ${formatStatus(newStatus).toLowerCase()} com sucesso!`, 'success');
+            showNotification(`Dispositivo ${formatStatus(newStatus).toLowerCase()} com sucesso!`, 'success');
             closeControlModal();
             // loadDoors(); // Listener updates state
 
         } catch (error) {
-            console.error(`Erro ao ${action} porta:`, error);
-            showNotification(`Erro ao ${action} porta: ${error.message}`, 'error');
+            console.error(`Erro ao ${action} dispositivo:`, error);
+            showNotification(`Erro ao ${action} dispositivo: ${error.message}`, 'error');
         } finally {
             setLoading(false);
         }
@@ -269,30 +287,30 @@ function Doors() {
         if (!currentDoor) return;
         setLoading(true);
         try {
-            await remove(ref(database, `doors/${currentDoor.id}`));
-            showNotification('Porta excluída com sucesso', 'success');
+            await remove(ref(database, `devices/${currentDoor.id}`));
+            showNotification('Dispositivo excluído com sucesso', 'success');
             closeConfirmModal();
             // loadDoors(); // Listener updates state
         } catch (error) {
-            console.error('Erro ao excluir porta:', error);
-            showNotification(`Erro ao excluir porta: ${error.message}`, 'error');
+            console.error('Erro ao excluir dispositivo:', error);
+            showNotification(`Erro ao excluir dispositivo: ${error.message}`, 'error');
         } finally {
             setLoading(false);
         }
     };
 
     const exportDoors = (format) => {
-        if (filteredDoors.length === 0) return showNotification('Não há portas para exportar', 'warning');
-        showNotification(`Exportando ${filteredDoors.length} portas para ${format.toUpperCase()}...`, 'info');
+        if (filteredDoors.length === 0) return showNotification('Não há dispositivos para exportar', 'warning');
+        showNotification(`Exportando ${filteredDoors.length} dispositivos para ${format.toUpperCase()}...`, 'info');
         // TODO: Implement export logic (similar to users export)
-        console.log(`TODO: Implement ${format} export for doors`);
+        console.log(`TODO: Implement ${format} export for devices`);
         setIsExportMenuOpen(false); // Close menu
     };
 
     // Nova função para alternar a autorização do usuário para a porta
     const handleToggleAuthorization = async (userId, isAuthorized) => {
         if (!currentDoorForAuthUsers || !currentDoorForAuthUsers.device) {
-            showNotification('Erro: Porta ou dispositivo não selecionado.', 'error');
+            showNotification('Erro: Dispositivo não selecionado.', 'error');
             return;
         }
 
@@ -359,9 +377,9 @@ function Doors() {
     return (
         <Layout>
             <div className="page-header">
-                <h1><FontAwesomeIcon icon={faDoorOpen} /> Gerenciamento de Portas</h1>
+                <h1><FontAwesomeIcon icon={faDoorOpen} /> Gerenciamento de Dispositivos</h1>
                 <button className="btn btn-primary" onClick={openAddDoorModal}>
-                    <FontAwesomeIcon icon={faPlus} /> Nova Porta
+                    <FontAwesomeIcon icon={faPlus} /> Novo Dispositivo
                 </button>
             </div>
 
@@ -382,7 +400,7 @@ function Doors() {
             {/* Doors Table */}
             <div className="card">
                 <div className="card-header">
-                    <h3>Lista de Portas ({filteredDoors.length})</h3>
+                    <h3>Lista de Dispositivos ({filteredDoors.length})</h3>
                     <div className="card-actions">
                         <button className="icon-button" onClick={loadDoors} title="Atualizar Lista">
                             <FontAwesomeIcon icon={faSyncAlt} />
@@ -452,7 +470,7 @@ function Doors() {
                                     </tr>
                                 ))
                             ) : (
-                                <tr><td colSpan="5" className="text-center">Nenhuma porta encontrada.</td></tr>
+                                <tr><td colSpan="5" className="text-center">Nenhum dispositivo encontrado.</td></tr>
                             )}
                             </tbody>
                         </table>
@@ -498,7 +516,7 @@ function Doors() {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-center">Nenhuma porta encontrada.</p>
+                            <p className="text-center">Nenhum dispositivo encontrado.</p>
                         )}
                     </div>
 
@@ -519,7 +537,7 @@ function Doors() {
             <Modal
                 isOpen={isAddEditModalOpen}
                 onClose={closeAddEditModal}
-                title={currentDoor ? 'Editar Porta' : 'Adicionar Nova Porta'}
+                title={currentDoor ? 'Editar Dispositivo' : 'Adicionar Novo Dispositivo'}
                 footer={
                     <>
                         <button className="btn btn-outline-secondary" onClick={closeAddEditModal}>Cancelar</button>
@@ -543,8 +561,8 @@ function Doors() {
                         <div className="form-group">
                             <label htmlFor="modal-door-status">Status Inicial</label>
                             <select id="modal-door-status" name="status" className="form-control" value={formData.status} onChange={handleFormInputChange} required>
-                                <option value="locked">Trancada</option>
-                                <option value="unlocked">Destrancada</option>
+                                <option value="locked">Trancado</option>
+                                <option value="unlocked">Destrancado</option>
                             </select>
                         </div>
                     )}
@@ -555,7 +573,7 @@ function Doors() {
             <Modal
                 isOpen={isControlModalOpen}
                 onClose={closeControlModal}
-                title={`Controlar Porta - ${currentDoor?.name || ''}`}
+                title={`Controlar Dispositivo - ${currentDoor?.name || ''}`}
                 footer={
                     <button className="btn btn-secondary" onClick={closeControlModal}>Fechar</button>
                 }
@@ -601,7 +619,7 @@ function Doors() {
                     </>
                 }
             >
-                <p>Tem certeza que deseja excluir a porta "{currentDoor?.name}"?</p>
+                <p>Tem certeza que deseja excluir o dispositivo "{currentDoor?.name}"?</p>
             </Modal>
 
             {/* Authorized Users Modal */}
@@ -678,7 +696,7 @@ function Doors() {
                     </>
                 ) : (
                     <p className="text-center">
-                        {modalSearchTerm ? 'Nenhum usuário encontrado com o termo buscado.' : 'Nenhum usuário cadastrado ou nenhum associado a esta porta ainda.'}
+                        {modalSearchTerm ? 'Nenhum usuário encontrado com o termo buscado.' : 'Nenhum usuário cadastrado ou nenhum associado a este dispositivo ainda.'}
                     </p>
                 )}
             </Modal>
