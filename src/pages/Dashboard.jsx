@@ -72,17 +72,26 @@ function Dashboard() {
         onValue(usersRef, usersCallback, usersErrorCallback); // Attach listener
         listeners.push({ ref: usersRef, callback: usersCallback }); // Store details
 
-        // --- Fetch Doors ---
-        const doorsRef = ref(database, 'doors');
+        // --- Fetch Doors (from devices collection) ---
+        const doorsRef = ref(database, 'devices');
         const doorsCallback = (snapshot) => {
-            const doorsData = snapshot.val();
+            const devicesData = snapshot.val();
             const doorsArray = [];
             let locked = 0, unlocked = 0;
-            if (doorsData) {
-                Object.entries(doorsData).forEach(([id, door]) => {
-                    doorsArray.push({ id, ...door });
-                    if (door.status === 'locked') locked++; else unlocked++;
-                });
+            if (devicesData) {
+                // Filtrar apenas dispositivos RFID (portas)
+                Object.entries(devicesData)
+                    .filter(([id, device]) => device.typeCode === 'rfid-reader' || !device.typeCode)
+                    .forEach(([id, device]) => {
+                        const door = {
+                            id,
+                            name: device.name || 'Dispositivo sem nome',
+                            location: device.location || 'Localização não definida',
+                            status: device.status || 'locked'
+                        };
+                        doorsArray.push(door);
+                        if (device.status === 'locked') locked++; else unlocked++;
+                    });
                 doorsArray.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
             }
             setStats(prev => ({ ...prev, doorsCount: doorsArray.length, lockedDoors: locked, unlockedDoors: unlocked }));
@@ -153,10 +162,10 @@ function Dashboard() {
     // --- Action Handlers ---
     const toggleDoorLock = async (doorId, currentStatus) => {
         if (!doorId) return;
-        const newStatus = currentStatus === 'locked' ? 'unlocked' : 'locked';
-        const doorRef = ref(database, `doors/${doorId}`);
+        const newCommand = currentStatus === 'locked' ? 'unlocked' : 'locked';
+        const deviceRef = ref(database, `devices/${doorId}`);
         const user = auth.currentUser;
-        let doorName = doorStatusList.find(d => d.id === doorId)?.name || 'Porta';
+        let doorName = doorStatusList.find(d => d.id === doorId)?.name || 'Dispositivo';
         let userName = user?.displayName || user?.email || 'Sistema';
 
         if (user && !user.displayName && user.email) {
@@ -175,23 +184,24 @@ function Dashboard() {
         // setLoading(true); // Or a specific loading state for the button
 
         try {
-            await update(doorRef, {
-                status: newStatus,
-                last_status_change: new Date().toISOString()
+            // Atualizar command_door e action_requested_at em vez de status
+            await update(deviceRef, {
+                command_door: newCommand,
+                action_requested_at: Date.now() // Timestamp em milliseconds
             });
 
             if (user) {
                 const logData = {
                     user_id: user.uid, user_name: userName, door_id: doorId, door_name: doorName,
-                    action: newStatus === 'locked' ? 'door_locked' : 'access_granted',
+                    action: newCommand === 'locked' ? 'door_locked' : 'access_granted',
                     method: 'web', timestamp: new Date().toISOString()
                 };
                 await push(ref(database, 'access_logs'), logData);
             }
-            showNotification(`Porta ${formatStatus(newStatus).toLowerCase()} com sucesso!`, 'success');
+            showNotification(`Comando ${formatStatus(newCommand).toLowerCase()} enviado com sucesso!`, 'success');
         } catch (error) {
             console.error("Error toggling door lock:", error);
-            showNotification(`Erro ao ${newStatus === 'locked' ? 'trancar' : 'destrancar'} porta: ${error.message}`, 'error');
+            showNotification(`Erro ao ${newCommand === 'locked' ? 'trancar' : 'destrancar'} dispositivo: ${error.message}`, 'error');
         } finally {
             // setLoading(false); // Reset loading state if used
         }

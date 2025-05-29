@@ -209,7 +209,8 @@ function Doors() {
             ...( !currentDoor && { 
                 typeCode: 'rfid-reader',
                 firmware: 'v1.0.0',
-                authorized_tags: {}
+                authorized_tags: {},
+                command_door: formData.status // Inicializar command_door com o mesmo valor do status
             })
         };
 
@@ -235,8 +236,10 @@ function Doors() {
 
     const handleToggleLock = async (action) => {
         if (!currentDoor) return;
-        const newStatus = action === 'lock' ? 'locked' : 'unlocked';
-        if (currentDoor.status === newStatus) {
+        const newCommand = action === 'lock' ? 'locked' : 'unlocked';
+        
+        // Verificar o status atual da porta (não o comando)
+        if (currentDoor.status === newCommand) {
             // Already in the desired state
             closeControlModal();
             return;
@@ -252,9 +255,10 @@ function Doors() {
         setLoading(true); // Indicate processing
 
         try {
+            // Atualizar command_door e action_requested_at em vez de status
             await update(deviceRef, {
-                status: newStatus,
-                last_status_change: new Date().toISOString()
+                command_door: newCommand,
+                action_requested_at: Date.now() // Timestamp em milliseconds
             });
 
             // Log the action
@@ -264,14 +268,14 @@ function Doors() {
                     user_name: userName,
                     door_id: currentDoor.id,
                     door_name: currentDoor.name || 'Dispositivo',
-                    action: newStatus === 'locked' ? 'door_locked' : 'access_granted', // Or 'door_unlocked' if preferred
+                    action: newCommand === 'locked' ? 'door_locked' : 'access_granted', // Or 'door_unlocked' if preferred
                     method: 'web',
                     timestamp: new Date().toISOString()
                 };
                 await push(ref(database, 'access_logs'), logData);
             }
 
-            showNotification(`Dispositivo ${formatStatus(newStatus).toLowerCase()} com sucesso!`, 'success');
+            showNotification(`Comando ${formatStatus(newCommand).toLowerCase()} enviado com sucesso!`, 'success');
             closeControlModal();
             // loadDoors(); // Listener updates state
 
