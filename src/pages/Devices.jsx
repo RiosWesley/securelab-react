@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faMicrochip, faPlus, faSyncAlt, faEllipsisV, faFileCsv, faFilePdf, faDownload,
     faEdit, faRedoAlt, faCog, faStethoscope, faTrashAlt, faExclamationTriangle,
-    faWifi, faTools, faBatteryQuarter, faSearch, faEye, faEyeSlash, faCopy
+    faWifi, faTools, faBatteryQuarter, faSearch, faEye, faEyeSlash, faCopy, faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 // Import icons for tabs if needed: faNetworkWired, faUserShield, faWrench etc.
 import { ref, onValue, get, push, update, remove, query, orderByChild } from 'firebase/database';
@@ -15,6 +15,7 @@ import { database } from '../firebase/firebaseConfig';
 import { showNotification } from '../utils/notifications';
 import { formatDate, getStatusClass, formatStatus } from '../utils/formatters';
 import { debounce } from '../utils/helpers';
+import DeviceMetricsChart from '../components/DeviceMetricsChart';
 import '../styles/devices.css'; // Import device-specific styles
 
 const PAGE_SIZE = 10; // Or your preferred page size
@@ -32,6 +33,7 @@ function Devices() {
     // Modal States
     const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
     const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+    const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [currentDevice, setCurrentDevice] = useState(null); // For modals
 
@@ -238,6 +240,13 @@ function Devices() {
             setLoading(false);
         }
     };
+
+    // Metrics Modal
+    const openMetricsModal = (device) => {
+        setCurrentDevice(device);
+        setIsMetricsModalOpen(true);
+    };
+    const closeMetricsModal = () => setIsMetricsModalOpen(false);
 
     // Confirm Modal & Actions
     const openConfirm = (title, message, onConfirm) => {
@@ -474,6 +483,9 @@ function Devices() {
                                                 <button className="action-btn action-btn-edit" onClick={() => openEditDeviceModal(device)} title="Editar">
                                                     <FontAwesomeIcon icon={faEdit} />
                                                 </button>
+                                                <button className="action-btn action-btn-info" onClick={() => openMetricsModal(device)} title="Ver Métricas">
+                                                    <FontAwesomeIcon icon={faChartLine} />
+                                                </button>
                                                 {device.status === 'offline' ? (
                                                     <button className="action-btn" onClick={() => handleDiagnostics(device)} title="Diagnóstico">
                                                         <FontAwesomeIcon icon={faStethoscope} />
@@ -665,6 +677,26 @@ function Devices() {
                 </div>
             </Modal>
 
+
+            {/* Device Metrics Modal */}
+            <Modal
+                isOpen={isMetricsModalOpen}
+                onClose={closeMetricsModal}
+                title={`Métricas - ${currentDevice?.name || 'Dispositivo'}`}
+                size="xl" // Use extra large modal for metrics
+                footer={
+                    <>
+                        <button className="btn btn-primary" onClick={closeMetricsModal}>Fechar</button>
+                    </>
+                }
+            >
+                {currentDevice && (
+                    <DeviceMetricsChart 
+                        deviceId={currentDevice.id} 
+                        deviceName={currentDevice.name} 
+                    />
+                )}
+            </Modal>
 
             {/* Confirm Action Modal */}
             <Modal

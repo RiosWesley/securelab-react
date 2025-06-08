@@ -17,6 +17,7 @@ import { formatDateTime, getStatusClass, formatStatus } from '../utils/formatter
 import { showNotification } from '../utils/notifications';
 import GeminiInsights from '../components/GeminiInsights'; // Import GeminiInsights
 import DevicePerformanceCard from '../components/DevicePerformanceCard'; // Import the new card
+import LastUsedDeviceMetrics from '../components/LastUsedDeviceMetrics'; // Import last used device metrics
 
 // Placeholder components if not fully implemented yet
 function DevicePerformancePlaceholder() {
@@ -419,18 +420,8 @@ function Dashboard() {
 
                     {/* Device Performance and Insights Row */}
                     <div className="card-row">
-                        {/* Device Performance */}
-                        <div className="card device-status-card">
-                            <div className="card-header">
-                                <h3>Performance dos Dispositivos</h3>
-                            </div>
-                            <div className="card-body">
-                                <DevicePerformanceCard /> {/* Use the actual component */}
-                                <div className="card-actions center">
-                                    <a href="/devices" className="btn btn-link">Ver Dispositivos</a>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Last Used Device Metrics */}
+                        <LastUsedDeviceMetrics />
 
                         {/* Insights Card */}
                         <div className="card insights-card">

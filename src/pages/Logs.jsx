@@ -10,7 +10,7 @@ import {
     faIdCard, faGlobe, faMobileAlt, faQuestion, // Method Icons
     faCheckCircle, faTimesCircle, faLock, faLockOpen // Action Icons (Add others if used)
 } from '@fortawesome/free-solid-svg-icons';
-import { ref, onValue, get, query, orderByChild, limitToLast, startAt, endAt } from 'firebase/database';
+import { ref, onValue, get, query, orderByChild, limitToLast, startAt, endAt, off } from 'firebase/database';
 import { database } from '../firebase/firebaseConfig';
 import { showNotification } from '../utils/notifications';
 import { formatDateTime, getStatusClass, formatStatus } from '../utils/formatters'; // Assuming formatters handle action text
@@ -45,17 +45,12 @@ function Logs() {
         setLoading(true);
         const logsRef = ref(database, 'access_logs');
 
-        // Determine date range for query (optional, can filter client-side too)
-        const { startDateTimestamp, endDateTimestamp } = calculateTimestamps(filters);
-
-        // Example Query (adjust based on performance needs)
-        // Fetch last 1000 for client-side filtering, or use startAt/endAt if indexed
+        // Query para buscar os últimos 1000 logs
         const logQuery = query(logsRef, orderByChild('timestamp'), limitToLast(1000));
-        // Or: const logQuery = query(logsRef, orderByChild('timestamp'), startAt(startDateTimestamp), endAt(endDateTimestamp));
 
-
-        get(logQuery) // Use get for potentially large dataset
-            .then(snapshot => {
+        // Usar onValue para atualização em tempo real
+        const unsubscribe = onValue(logQuery, 
+            (snapshot) => {
                 const logsData = snapshot.val();
                 let logsArray = [];
                 if (logsData) {
@@ -64,17 +59,29 @@ function Logs() {
                 // Sort by timestamp descending (most recent first)
                 logsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 setLogs(logsArray);
-            })
-            .catch(error => {
+                setLoading(false);
+            },
+            (error) => {
                 console.error("Error loading logs:", error);
-                showNotification("Error loading logs: " + error.message, 'error');
-            })
-            .finally(() => setLoading(false));
+                showNotification("Erro ao carregar logs: " + error.message, 'error');
+                setLoading(false);
+            }
+        );
 
-    }, [filters]); // Reload when filters potentially affecting query change
+        // Retornar função de limpeza para o useEffect
+        return unsubscribe;
+
+    }, []); // Removido filters da dependência pois não afeta a query
 
     useEffect(() => {
-        loadLogs();
+        const unsubscribe = loadLogs();
+        
+        // Cleanup function para remover listener
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
     }, [loadLogs]);
 
     // Client-side filtering effect
@@ -82,6 +89,7 @@ function Logs() {
         const { startDateTimestamp, endDateTimestamp } = calculateTimestamps(filters);
         const lowerUser = filters.user.toLowerCase();
         const lowerDoor = filters.door.toLowerCase();
+        const lowerMethod = filters.method.toLowerCase();
 
         const result = logs.filter(log => {
             const logTimestamp = new Date(log.timestamp).getTime();
@@ -91,7 +99,7 @@ function Logs() {
             // Action Filter
             if (filters.action && log.action !== filters.action) return false;
             // Method Filter
-            if (filters.method && log.method !== filters.method) return false;
+            if (lowerMethod && (log.method?.toLowerCase() || '') !== lowerMethod) return false;
             // User Filter
             if (lowerUser && !(log.user_name?.toLowerCase() || '').includes(lowerUser)) return false;
             // Door Filter
@@ -214,6 +222,11 @@ function Logs() {
 
     const handlePageChange = (page) => setCurrentPage(page);
 
+    // Função de atualização manual (agora apenas mostra notificação já que está em tempo real)
+    const handleManualRefresh = () => {
+        showNotification("Os logs são atualizados automaticamente em tempo real.", "info");
+    };
+
     const exportLogsHandler = (format) => {
         if (filteredLogs.length === 0) return showNotification('Não há logs para exportar', 'warning');
         showNotification(`Exportando ${filteredLogs.length} logs para ${format.toUpperCase()}...`, 'info');
@@ -249,7 +262,8 @@ function Logs() {
 
     // Get Method Icon
     const getMethodIcon = (method) => {
-        switch (method) {
+        const methodLower = method?.toLowerCase() || '';
+        switch (methodLower) {
             case 'rfid': return faIdCard;
             case 'web': return faGlobe;
             case 'app': return faMobileAlt;
@@ -270,7 +284,7 @@ function Logs() {
             <div className="page-header">
                 <h1><FontAwesomeIcon icon={faClipboardList} /> Logs de Acesso</h1>
                 <div className="page-actions d-flex gap-2"> {/* Use flex and gap */}
-                    <button className="btn btn-outline-primary" onClick={loadLogs}>
+                    <button className="btn btn-outline-primary" onClick={handleManualRefresh}>
                         <FontAwesomeIcon icon={faSyncAlt} /> Atualizar
                     </button>
                     <div className="dropdown">
@@ -386,6 +400,7 @@ function Logs() {
                     <h3>Registros de Acesso</h3>
                     <div className="logs-count">
                         <span id="logs-count">{filteredLogs.length}</span> registros encontrados
+                        <small className="text-muted ms-2">(Atualização em tempo real)</small>
                     </div>
                 </div>
                 <div className="card-body">

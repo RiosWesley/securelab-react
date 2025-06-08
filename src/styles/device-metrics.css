@@ -1,0 +1,492 @@
+/* Device Metrics Styles - Following Dashboard Pattern */
+.device-metrics-container {
+    padding: 0;
+}
+
+.device-metrics-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    background: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.device-metrics-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.device-metrics-loading,
+.device-metrics-error {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Summary Cards - Similar to Dashboard Status Cards */
+.metrics-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 0 1.5rem;
+}
+
+.metric-summary-card {
+    background: white;
+    border-radius: var(--card-border-radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.metric-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.metric-summary-header .metric-icon {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    width: 20px;
+    text-align: center;
+}
+
+.metric-summary-header .metric-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-summary-value {
+    text-align: center;
+}
+
+.metric-summary-value .metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    display: block;
+}
+
+.metric-summary-value .metric-value.success {
+    color: var(--success-color);
+}
+
+.metric-summary-value .metric-value.warning {
+    color: var(--warning-color);
+}
+
+.metric-summary-value .metric-value.danger {
+    color: var(--danger-color);
+}
+
+/* Chart Container - Standard Card Layout */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+}
+
+/* Benchmark Metrics - Reusing Dashboard Pattern */
+.benchmark-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.benchmark-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.benchmark-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 80px;
+    font-weight: 500;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+
+.benchmark-label svg {
+    color: var(--primary-color);
+    width: 16px;
+}
+
+.benchmark-bar-container {
+    flex-grow: 1;
+    height: 18px;
+    background-color: #e9ecef;
+    border-radius: 9px;
+    overflow: hidden;
+    position: relative;
+}
+
+.benchmark-bar {
+    height: 100%;
+    border-radius: 9px;
+    transition: width 0.5s ease;
+    background: linear-gradient(90deg, #28a745 0%, #28a745 100%);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.benchmark-bar-value {
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0 8px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    white-space: nowrap;
+}
+
+.benchmark-bar.warning .benchmark-bar-value,
+.benchmark-bar.danger .benchmark-bar-value {
+    color: var(--dark-color);
+    text-shadow: none;
+}
+
+.benchmark-bar.success {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.benchmark-bar.warning {
+    background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.benchmark-bar.danger {
+    background: linear-gradient(90deg, #dc3545 0%, #e74c3c 100%);
+}
+
+.benchmark-value {
+    min-width: 60px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+
+/* Metric Info Item - For Latency */
+.metric-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(var(--primary-color-rgb), 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.1);
+}
+
+.metric-info-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.metric-info-label svg {
+    color: var(--primary-color);
+    width: 16px;
+}
+
+.metric-info-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.status-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    text-transform: capitalize;
+    min-width: 80px;
+    text-align: center;
+    display: inline-block;
+}
+
+.status-badge.success {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.metric-status {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    font-style: italic;
+}
+
+/* Action button styles for metrics */
+.action-btn-info {
+    background-color: #17a2b8;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.action-btn-info:hover {
+    background-color: #138496;
+    transform: translateY(-1px);
+}
+
+/* Modal Sizing */
+.modal.size-xl .modal-dialog {
+    max-width: 95vw;
+}
+
+.modal.size-xl .modal-content {
+    min-height: 80vh;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .metrics-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0 1rem;
+    }
+    
+    .metric-summary-card {
+        padding: 1rem;
+    }
+    
+    .metric-summary-value .metric-value {
+        font-size: 1.5rem;
+    }
+    
+    .device-metrics-container .row {
+        margin: 0;
+    }
+    
+    .device-metrics-container .row [class*="col-"] {
+        padding: 0.5rem;
+    }
+    
+    .benchmark-item {
+        gap: 0.5rem;
+    }
+    
+    .benchmark-label {
+        min-width: 60px;
+        font-size: 0.8rem;
+    }
+    
+    .benchmark-value {
+        min-width: 50px;
+        font-size: 0.8rem;
+    }
+    
+    .metric-info-item {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .metric-info-value {
+        align-items: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .metrics-summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal.size-xl .modal-dialog {
+        max-width: 98vw;
+        margin: 0.5rem;
+    }
+}
+
+/* Dark Mode Support */
+html[data-theme="dark"] .device-metrics-header {
+    background: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .device-metrics-header h4 {
+    color: var(--dark-primary-color);
+}
+
+html[data-theme="dark"] .metric-summary-card {
+    background: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .metric-summary-header .metric-name {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .metric-summary-header .metric-icon {
+    color: var(--dark-primary-color);
+}
+
+html[data-theme="dark"] .benchmark-label {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .benchmark-label svg {
+    color: var(--dark-primary-color);
+}
+
+html[data-theme="dark"] .benchmark-bar-container {
+    background-color: var(--dark-input-bg);
+}
+
+html[data-theme="dark"] .benchmark-value {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .metric-info-item {
+    background: rgba(var(--dark-primary-color-rgb), 0.1);
+    border-color: rgba(var(--dark-primary-color-rgb), 0.2);
+}
+
+html[data-theme="dark"] .metric-info-label {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .metric-info-label svg {
+    color: var(--dark-primary-color);
+}
+
+html[data-theme="dark"] .metric-status {
+    color: var(--dark-text-secondary);
+}
+
+/* Animation for metric updates */
+@keyframes metricPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.metric-summary-value .metric-value.updating {
+    animation: metricPulse 0.3s ease;
+}
+
+@keyframes barUpdate {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); }
+    100% { opacity: 1; }
+}
+
+.benchmark-bar.updating {
+    animation: barUpdate 0.5s ease;
+}
+
+/* Last Used Device Metrics - Specific Adjustments */
+.device-status-card-v2 .card-actions .icon-button {
+    background: transparent;
+    border: none;
+    color: var(--secondary-color);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.device-status-card-v2 .card-actions .icon-button:hover {
+    background: rgba(var(--primary-color-rgb), 0.1);
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.device-status-card-v2 .mt-3 {
+    margin-top: 1rem;
+}
+
+/* Ensure the card has proper width in the dashboard row */
+.card-row .device-status-card-v2 {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.card-row .device-status-card-v2:last-child {
+    margin-right: 0;
+}
+
+/* Dark mode for card actions */
+html[data-theme="dark"] .device-status-card-v2 .card-actions .icon-button {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .device-status-card-v2 .card-actions .icon-button:hover {
+    background: rgba(var(--dark-primary-color-rgb), 0.2);
+    color: var(--dark-primary-color);
+}
+
+/* Last Used Device Card Styles */
+.performance-section {
+    padding: 1.5rem;
+    padding-top: 1rem;
+}
+
+.performance-title {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    width: 100%;
+}
+
+.performance-title::before,
+.performance-title::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 100px); /* Adjust based on text width */
+    height: 1px;
+    background-color: var(--border-color);
+}
+
+.performance-title::before {
+    left: 0;
+}
+
+.performance-title::after {
+    right: 0;
+}
+
+.latency-value-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    min-width: 80px;
+} 
